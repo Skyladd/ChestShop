@@ -14,7 +14,7 @@ class ChestShop extends PluginBase
 {
     public function onLoad()
     {
-        $this->getLogger()->info(TextFormat::RED . "Enabled");
+        $this->getLogger()->info(TextFormat::GREEN . "Loading...");
     }
 
     public function onEnable()
