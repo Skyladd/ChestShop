@@ -57,7 +57,7 @@ class EventListener implements Listener
                 $itemNum = 0;
                 $pID = $shopInfo['productID'];
                 $pMeta = $shopInfo['productMeta'];
-                $productName = Block::get($pID)->getName();
+				$productName = Item::fromString($pID, $pMeta)->getName();
                 for ($i = 0; $i < $chest->getSize(); $i++) {
                     $item = $chest->getInventory()->getItem($i);
                     // use getDamage() method to get metadata of item
@@ -163,12 +163,23 @@ class EventListener implements Listener
 
     public function onSignChange(SignChangeEvent $event)
     {
+		/*if(strtolower($event->getLine(0)) != "[shop]"){
+			//The sign is not a shop, ignore
+			return;
+		}*/
+		
         $shopOwner = $event->getPlayer()->getName();
-        $saleNum = $event->getLine(1);
+		$saleNum = $event->getLine(1);
         $price = $event->getLine(2);
-        $productData = explode(":", $event->getLine(3));
-        $pID = $this->isItem($id = array_shift($productData)) ? $id : false;
-        $pMeta = ($meta = array_shift($productData)) ? $meta : 0;
+        //$productData = explode(":", $event->getLine(3));
+		$item = Item::fromString($event->getLine(3));
+		if($item->getID() < 1){ //Invalid item ID/name
+			$player->sendMessage(TextFormat::RED."Invalid item name or ID");
+			$event->setCancelled();
+			return;
+		}
+        $pID = $item->getID();
+        $pMeta = $item->getDamage();
 
         $sign = $event->getBlock();
 
@@ -179,7 +190,8 @@ class EventListener implements Listener
         if ($pID === false) return;
         if (($chest = $this->getSideChest($sign)) === false) return;
 
-        $productName = Block::get($pID)->getName();
+        $productName = $item->getName();
+		
         $event->setLine(0, TextFormat::WHITE.$shopOwner);
         $event->setLine(1, "B $saleNum");
         $event->setLine(2, "$price");
@@ -188,8 +200,7 @@ class EventListener implements Listener
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
     }
 
-    private function getSideChest(Position $pos)
-    {
+    private function getSideChest(Position $pos){		
         $block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
         if ($block->getID() === Block::CHEST) return $block;
         $block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ()));
