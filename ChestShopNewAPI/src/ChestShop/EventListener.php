@@ -119,6 +119,9 @@ class EventListener implements Listener
                     "chestZ" => $block->getZ()
                 ]);
 				if($shopInfo !== false){
+                    if($player->hasPermission('chestshop.manager')){
+                     return;
+                      }
 					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
 						return;
@@ -128,8 +131,8 @@ class EventListener implements Listener
                       }
                        if($player->getGamemode() == 1){
 						$player->sendMessage(TextFormat::RED."You can't stock in creative");
-                                                $event->setCancelled();
-                                                return;
+                        $event->setCancelled();
+                        return;
 					}
 				}
                 break;
@@ -154,15 +157,23 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
+                    if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
+                    }
                     if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
                         return;
+                        if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
+                  }
                     }
                 }
                 break;
-
+          switch ($block->getID()) {
             case Block::CHEST:
                 $condition = [
                     "chestX" => $block->getX(),
@@ -171,11 +182,15 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
-					
+                    }
                     if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
+                        return;
+                        if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
                     }
                 }
                 break;
@@ -184,6 +199,7 @@ class EventListener implements Listener
                 break;
         }
     }
+}
 //Normal sign transform to shop sign
     public function onSignChange(SignChangeEvent $event)
     {
