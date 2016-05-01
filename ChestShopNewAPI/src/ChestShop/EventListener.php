@@ -97,7 +97,7 @@ class EventListener implements Listener
                         }
                     }
                 }
-                $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower(player->getName()), $price, $shopInfo['shopOwner']);
+                $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
 
                 $player->sendMessage(TextFormat::GREEN."Bought {$saleNum} $productName for {$price}$");
                 if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
