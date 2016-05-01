@@ -65,7 +65,7 @@ class EventListener implements Listener
                 }
 				$price = $shopInfo['price'];
 				$saleNum = $shopInfo['saleNum'];
-                if ($itemNum < 1) {
+                if ($itemNum < $saleNum) {
                     if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
 	                    $p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
 	                }
