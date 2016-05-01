@@ -57,6 +57,7 @@ class EventListener implements Listener
                 $itemNum = 0;
                 $pID = $shopInfo['productID'];
                 $pMeta = $shopInfo['productMeta'];
+                $productName = Block::get($pID)->getName();
                 for ($i = 0; $i < $chest->getSize(); $i++) {
                     $item = $chest->getInventory()->getItem($i);
                     // use getDamage() method to get metadata of item
@@ -65,7 +66,7 @@ class EventListener implements Listener
                 if ($itemNum < $shopInfo['saleNum']) {
                     $player->sendMessage(TextFormat::RED."This shop is out of stock");
                     if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
-                        $p->sendMessage(TextFormat::RED."Your {$shopInfo['productID']} is out of stock");
+                        $p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
                     }
                     return;
                 }
@@ -89,9 +90,9 @@ class EventListener implements Listener
                 }
                 $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer($player->getName(), $shopInfo['price'], $shopInfo['shopOwner']);
 
-                $player->sendMessage(TextFormat::GREEN."Bought {$shopInfo['saleNum']} $productData for {$shopInfo['price']}$");
+                $player->sendMessage(TextFormat::GREEN."Bought {$shopInfo['saleNum']} $productName for {$shopInfo['price']}$");
                 if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
-                    $p->sendMessage(TextFormat::WHITE."{$player->getName()} bought {$shopInfo['saleNum']} $productData for {$shopInfo['price']}$");
+                    $p->sendMessage(TextFormat::WHITE."{$player->getName()} bought {$shopInfo['saleNum']} $productName for {$shopInfo['price']}$");
                 }
                 break;
 
