@@ -205,7 +205,7 @@ class EventListener implements Listener
 		
 		
 		
-        $event->setLine(0, TextFormat::WHITE.$event->getPlayer->getName());
+        $event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
         $event->setLine(1, "B $saleNum");
         $event->setLine(2, ($price == 0? "FREE" : $price));
         $event->setLine(3, "$productName");
