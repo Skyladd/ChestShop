@@ -108,7 +108,6 @@ class EventListener implements Listener
                         $event->setCancelled();
 					}
 					if ($shopInfo['shopOwner'] !== $player->getName()) {
-						$player->sendMessage(TextFormat::RED."This isn't your shop");
 						$event->setCancelled();
 					}
 				}
@@ -135,7 +134,6 @@ class EventListener implements Listener
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
                     if ($shopInfo['shopOwner'] !== $player->getName()) {
-                        $player->sendMessage(TextFormat::RED."This isn't your shop");
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
@@ -154,7 +152,6 @@ class EventListener implements Listener
                 if ($shopInfo !== false) {
 					
                     if ($shopInfo['shopOwner'] !== $player->getName()) {
-                        $player->sendMessage(TextFormat::RED."This isn't your shop");
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
