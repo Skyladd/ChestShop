@@ -139,7 +139,7 @@ class EventListener implements Listener
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
-                        $player->sendMessage(TextFormat::RED."Shop Closed");
+                        $player->sendMessage(TextFormat::RED."Shop closed");
                     }
                 }
                 break;
