@@ -202,6 +202,7 @@ class EventListener implements Listener
         $event->setLine(3, "$productName");
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
+        $event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
     }
 
     private function getSideChest(Position $pos){		
