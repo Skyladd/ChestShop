@@ -11,3 +11,6 @@ permissions:
  chestshop:
   default: true
   description: "Allows using all the ChestShop things"
+ chestshop.creative:
+  default: op
+  description: "Allows filling shops in creative mode"
