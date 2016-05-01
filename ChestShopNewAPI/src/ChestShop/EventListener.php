@@ -13,8 +13,8 @@ use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Chest as TileChest;
 use pocketmine\utils\TextFormat;
-
-
+//Don't touch |
+//            v
 class EventListener implements Listener
 {
     private $plugin;
@@ -25,7 +25,10 @@ class EventListener implements Listener
         $this->plugin = $plugin;
         $this->databaseManager = $databaseManager;
     }
+//Dont touch ^
+//           |
 
+//Player touch sign and chest events
     public function onPlayerInteract(PlayerInteractEvent $event)
     {
         $block = $event->getBlock();
@@ -133,7 +136,7 @@ class EventListener implements Listener
                 break;
         }
     }
-
+//Protect chests and signs
     public function onPlayerBreakBlock(BlockBreakEvent $event)
     {
         $block = $event->getBlock();
@@ -180,7 +183,7 @@ class EventListener implements Listener
                 break;
         }
     }
-
+//Normal sign transform to shop sign
     public function onSignChange(SignChangeEvent $event)
     {
 		/*if(strtolower($event->getLine(0)) != "[shop]"){
@@ -220,7 +223,7 @@ class EventListener implements Listener
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
         $event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
     }
-
+//Where sign can be placed for useable shop
     private function getSideChest(Position $pos){		
         $block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
         if ($block->getID() === Block::CHEST) return $block;
