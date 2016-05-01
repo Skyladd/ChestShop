@@ -115,16 +115,16 @@ class EventListener implements Listener
                     "chestY" => $block->getY(),
                     "chestZ" => $block->getZ()
                 ]);
-				if($shopInfo !== false){
-					if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
+				if($shopInfo['shopOwner'] !== null){
 					if($player->getGamemode() == 1){
 						$player->sendMessage(TextFormat::RED."You can't stock in creative");
-                        $event->setCancelled();
+                                                $event->setCancelled();
+                                                return;
 					}
 					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
+						return;
 					}
-				}
 				}
                 break;
 
