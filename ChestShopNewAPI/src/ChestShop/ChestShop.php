@@ -31,6 +31,7 @@ class ChestShop extends PluginBase
 
     public function onDisable()
     {
+        $this->getLogger()->info(TextFormat::GREEN . "Disabled");
     }
 
     public function onCommand(CommandSender $sender, Command $command, $label, array $args)
