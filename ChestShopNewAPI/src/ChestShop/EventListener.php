@@ -41,7 +41,6 @@ class EventListener implements Listener
                     ])) === false) return;
 				$event->setCancelled();
                 if ($shopInfo['shopOwner'] === $player->getName()) {
-                    $player->sendMessage(TextFormat::RED."Cannot buy from your own shop");
                     return;
                 }
                 $buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney($player->getName());
