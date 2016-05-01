@@ -65,7 +65,7 @@ class EventListener implements Listener
                 }
 				$price = $shopInfo['price'];
 				$saleNum = $shopInfo['saleNum'];
-                if ($itemNum < $saleNum) {
+                if ($itemNum < 1) {
                     if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
 	                    $p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
 	                }
@@ -76,7 +76,6 @@ class EventListener implements Listener
 						//Not enough stock to make a full sale, make partial sale instead
 						$price = ($price/$saleNum)*$itemNum;
 						$saleNum = $itemNum;
-						$player->sendMessage(TextFormat::RED."Making a partial sale, not enough stock left");  
 					}
                 }
 
