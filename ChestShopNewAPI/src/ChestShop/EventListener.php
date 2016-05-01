@@ -46,6 +46,7 @@ class EventListener implements Listener
                 if($player->getGamemode() == 1){
 		$player->sendMessage(TextFormat::RED."You can't buy in creative");
                         $event->setCancelled();
+                }
                 $buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
                 if (!is_numeric($buyerMoney)) { // Probably $buyerMoney is instance of SimpleError
                     $player->sendMessage("Couldn't acquire your money data!");
