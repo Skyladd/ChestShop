@@ -105,7 +105,7 @@ class EventListener implements Listener
                 ]);
 				if($shopInfo !== false){
 					if($player->getGamemode() == 1){
-						$player->sendMessage(TextFormat::RED."You're not allowed to do that");
+						$player->sendMessage(TextFormat::RED."You can't stock in creative");
                         $event->setCancelled();
 					}
 					if ($shopInfo['shopOwner'] !== $player->getName()) {
