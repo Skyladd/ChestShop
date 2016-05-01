@@ -40,10 +40,10 @@ class EventListener implements Listener
                         "signZ" => $block->getZ()
                     ])) === false) return;
 				$event->setCancelled();
-                if ($shopInfo['shopOwner'] === $player->getName()) {
+                if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
                     return;
                 }
-                $buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney($player->getName());
+                $buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
                 if (!is_numeric($buyerMoney)) { // Probably $buyerMoney is instance of SimpleError
                     $player->sendMessage("Couldn't acquire your money data!");
                     return;
@@ -63,18 +63,27 @@ class EventListener implements Listener
                     // use getDamage() method to get metadata of item
                     if ($item->getID() === $pID and $item->getDamage() === $pMeta) $itemNum += $item->getCount();
                 }
-                if ($itemNum < $shopInfo['saleNum']) {
-                    $player->sendMessage(TextFormat::RED."This shop is out of stock");
+				$price = $shopInfo['price'];
+				$saleNum = $shopInfo['saleNum'];
+                if ($itemNum < $saleNum) {
                     if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
-                        $p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
-                    }
-                    return;
+	                    $p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
+	                }
+					if($itemNum == 0){
+						$player->sendMessage(TextFormat::RED."This shop is out of stock");
+						return;
+					}else{
+						//Not enough stock to make a full sale, make partial sale instead
+						$price = ($price/$saleNum)*$itemNum;
+						$saleNum = $itemNum;
+						$player->sendMessage(TextFormat::RED."Making a partial sale, not enough stock left");  
+					}
                 }
 
                 //TODO Improve this
-                $player->getInventory()->addItem(clone Item::get((int)$shopInfo['productID'], (int)$shopInfo['productMeta'], (int)$shopInfo['saleNum']));
+                $player->getInventory()->addItem(clone Item::get((int)$shopInfo['productID'], (int)$shopInfo['productMeta'], (int)$saleNum));
 
-                $tmpNum = $shopInfo['saleNum'];
+                $tmpNum = $saleNum;
                 for ($i = 0; $i < $chest->getSize(); $i++) {
                     $item = $chest->getInventory()->getItem($i);
                     // Use getDamage() method to get metadata of item
@@ -88,11 +97,11 @@ class EventListener implements Listener
                         }
                     }
                 }
-                $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer($player->getName(), $shopInfo['price'], $shopInfo['shopOwner']);
+                $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower(player->getName()), $price, $shopInfo['shopOwner']);
 
-                $player->sendMessage(TextFormat::GREEN."Bought {$shopInfo['saleNum']} $productName for {$shopInfo['price']}$");
+                $player->sendMessage(TextFormat::GREEN."Bought {$saleNum} $productName for {$price}$");
                 if (($p = $this->plugin->getServer()->getPlayer($shopInfo['shopOwner'])) !== null) {
-                    $p->sendMessage(TextFormat::WHITE."{$player->getName()} bought {$shopInfo['saleNum']} $productName for {$shopInfo['price']}$");
+                    $p->sendMessage(TextFormat::WHITE."{$player->getName()} bought {$saleNum} $productName for {$price}$");
                 }
                 break;
 
@@ -107,7 +116,7 @@ class EventListener implements Listener
 						$player->sendMessage(TextFormat::RED."You can't stock in creative");
                         $event->setCancelled();
 					}
-					if ($shopInfo['shopOwner'] !== $player->getName()) {
+					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
 					}
 				}
@@ -133,7 +142,7 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
-                    if ($shopInfo['shopOwner'] !== $player->getName()) {
+                    if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
@@ -151,7 +160,7 @@ class EventListener implements Listener
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
 					
-                    if ($shopInfo['shopOwner'] !== $player->getName()) {
+                    if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
@@ -172,7 +181,7 @@ class EventListener implements Listener
 			return;
 		}*/
 		
-        $shopOwner = $event->getPlayer()->getName();
+        $shopOwner = strtolower($event->getPlayer()->getName());
 		$saleNum = $event->getLine(1);
         $price = $event->getLine(2);
         //$productData = explode(":", $event->getLine(3));
@@ -196,7 +205,7 @@ class EventListener implements Listener
 		
 		
 		
-        $event->setLine(0, TextFormat::WHITE.$shopOwner);
+        $event->setLine(0, TextFormat::WHITE.$event->getPlayer->getName());
         $event->setLine(1, "B $saleNum");
         $event->setLine(2, ($price == 0? "FREE" : $price));
         $event->setLine(3, "$productName");
