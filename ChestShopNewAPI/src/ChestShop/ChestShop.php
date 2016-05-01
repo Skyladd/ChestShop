@@ -20,7 +20,7 @@ class ChestShop extends PluginBase
     {
         if (!file_exists($this->getDataFolder())) @mkdir($this->getDataFolder());
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this, new DatabaseManager($this->getDataFolder() . 'ChestShop.sqlite3')), $this);
-        if(MassiveEconomyAPI::getInstance()->getAPIVersion() == "0.90"){ //Checking API version. Important for API Functions Calls
+        if(MassiveEconomyAPI::getInstance()->getAPIVersion() == "2.0.0"){ //Checking API version. Important for API Functions Calls
     		$this->getLogger()->info(TextFormat::GREEN . "Enabled");
     	}else{
     		$this->getLogger()->alert(TextFormat::RED . "Plugin disabled. Please use MassiveEconomy");
