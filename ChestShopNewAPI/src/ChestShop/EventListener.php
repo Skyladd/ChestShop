@@ -103,14 +103,16 @@ class EventListener implements Listener
                     "chestY" => $block->getY(),
                     "chestZ" => $block->getZ()
                 ]);
-				if($player->getGamemode() == 1){
+				if($shopInfo !== false){
+					if($player->getGamemode() == 1){
 						$player->sendMessage(TextFormat::RED."You're not allowed to do that");
                         $event->setCancelled();
+					}
+					if ($shopInfo['shopOwner'] !== $player->getName()) {
+						$player->sendMessage(TextFormat::RED."This isn't your shop");
+						$event->setCancelled();
+					}
 				}
-                if ($shopInfo !== false && $shopInfo['shopOwner'] !== $player->getName()) {
-                    $player->sendMessage(TextFormat::RED."This isn't your shop");
-                    $event->setCancelled();
-                }
                 break;
 
             default:
