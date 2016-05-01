@@ -180,8 +180,7 @@ class EventListener implements Listener
         $price = $event->getLine(2);
         //$productData = explode(":", $event->getLine(3));
 		$item = Item::fromString($event->getLine(3));
-		if($item->getID() < Item::fromString){ //Invalid item ID/name
-			$event->getPlayer()->sendMessage(TextFormat::RED."Invalid item name or ID");
+		if($item->getID() < 0){ //Invalid item ID/name
 			return;
 		}
         $pID = $item->getID();
