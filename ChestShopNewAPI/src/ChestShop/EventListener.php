@@ -103,6 +103,10 @@ class EventListener implements Listener
                     "chestY" => $block->getY(),
                     "chestZ" => $block->getZ()
                 ]);
+				if($player->getGamemode() == 1){
+						$player->sendMessage(TextFormat::RED."You're not allowed to do that");
+                        $event->setCancelled();
+				}
                 if ($shopInfo !== false && $shopInfo['shopOwner'] !== $player->getName()) {
                     $player->sendMessage(TextFormat::RED."This isn't your shop");
                     $event->setCancelled();
@@ -147,10 +151,7 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
-					if($player->getGamemode == 1){
-						$player->sendMessage(TextFormat::RED."You're not allowed to do that");
-                        $event->setCancelled();
-					}
+					
                     if ($shopInfo['shopOwner'] !== $player->getName()) {
                         $player->sendMessage(TextFormat::RED."This isn't your shop");
                         $event->setCancelled();
@@ -197,9 +198,11 @@ class EventListener implements Listener
 
         $productName = $item->getName();
 		
+		
+		
         $event->setLine(0, TextFormat::WHITE.$shopOwner);
         $event->setLine(1, "B $saleNum");
-        $event->setLine(2, "$price");
+        $event->setLine(2, ($price == 0? "FREE!": $price));
         $event->setLine(3, "$productName");
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
