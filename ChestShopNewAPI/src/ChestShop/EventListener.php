@@ -181,7 +181,7 @@ class EventListener implements Listener
         //$productData = explode(":", $event->getLine(3));
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
-			$event->player->sendMessage(TextFormat::RED."Invalid item name or ID");
+			$event->getPlayer()->sendMessage(TextFormat::RED."Invalid item name or ID");
 			$event->setCancelled();
 			return;
 		}
