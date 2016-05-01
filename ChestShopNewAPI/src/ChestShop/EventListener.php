@@ -123,12 +123,14 @@ class EventListener implements Listener
 						$event->setCancelled();
 						return;
 					}
-					if($player->getGamemode() == 1){
+                     if($player->hasPermission('chestshop.creative')){
+                     return;
+                      }
+                       if($player->getGamemode() == 1){
 						$player->sendMessage(TextFormat::RED."You can't stock in creative");
                                                 $event->setCancelled();
                                                 return;
 					}
-					
 				}
                 break;
 
