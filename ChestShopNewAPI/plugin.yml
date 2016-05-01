@@ -1,0 +1,13 @@
+name: ChestShop
+main: ChestShop\ChestShop
+version: 2.0.1
+api: [1.10.0]
+load: POSTWORLD
+author: Skyladd
+description: Open your ChestShop
+depend:
+ - MassiveEconomy
+permissions:
+ chestshop:
+  default: true
+  description: "Allows using all the ChestShop things"
