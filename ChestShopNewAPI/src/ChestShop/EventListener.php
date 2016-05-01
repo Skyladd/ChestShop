@@ -174,7 +174,6 @@ class EventListener implements Listener
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
-                        $player->sendMessage(TextFormat::RED."Shop Closed");
                     }
                 }
                 break;
@@ -222,6 +221,7 @@ class EventListener implements Listener
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
         $event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
+        return;
     }
 //Where sign can be placed for useable shop
     private function getSideChest(Position $pos){		
