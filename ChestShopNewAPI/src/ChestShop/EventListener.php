@@ -147,6 +147,10 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
+					if($player->getGamemode == 1){
+						$player->sendMessage(TextFormat::RED."You're not allowed to do that");
+                        $event->setCancelled();
+					}
                     if ($shopInfo['shopOwner'] !== $player->getName()) {
                         $player->sendMessage(TextFormat::RED."This isn't your shop");
                         $event->setCancelled();
@@ -175,7 +179,7 @@ class EventListener implements Listener
         //$productData = explode(":", $event->getLine(3));
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
-			$event->getPlayer()->sendMessage(TextFormat::RED."Invalid item name or ID");
+			$event->player->sendMessage(TextFormat::RED."Invalid item name or ID");
 			$event->setCancelled();
 			return;
 		}
