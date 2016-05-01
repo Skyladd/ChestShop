@@ -202,7 +202,7 @@ class EventListener implements Listener
 		
         $event->setLine(0, TextFormat::WHITE.$shopOwner);
         $event->setLine(1, "B $saleNum");
-        $event->setLine(2, ($price == 0? "FREE!": $price));
+        $event->setLine(2, ($price == 0? "FREE" $price));
         $event->setLine(3, "$productName");
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
