@@ -171,10 +171,17 @@ class EventListener implements Listener
 
     public function onSignChange(SignChangeEvent $event)
     {
-		/*if(strtolower($event->getLine(0)) != "[shop]"){
-			//The sign is not a shop, ignore
-			return;
-		}*/
+		if (!(($chest = $this->getSideChest($sign = $event->getBlock())) and strtolower($event->getLine(0)) == "")) return;
+		
+		// Anti message spam. Not sure why signChangeEvent sometimes gets triggered twice, but here's a fix
+		$condition = [
+                    "signX" => $sign->getX(),
+                    "signY" => $sign->getY(),
+                    "signZ" => $sign->getZ()
+        ];
+        $shopInfo = $this->databaseManager->selectByCondition($condition);
+		if($shopInfo != false) return;
+
 		
         $shopOwner = $event->getPlayer()->getName();
 		$saleNum = $event->getLine(1);
@@ -182,32 +189,31 @@ class EventListener implements Listener
         //$productData = explode(":", $event->getLine(3));
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
-			$event->getPlayer()->sendMessage(TextFormat::RED."Invalid item name or ID");
-			$event->setCancelled();
+			//$event->getPlayer()->sendMessage(TextFormat::RED."Invalid item name or ID");
+			//$event->setCancelled();
 			return;
 		}
         $pID = $item->getID();
         $pMeta = $item->getDamage();
 
-        $sign = $event->getBlock();
+        //$sign = $event->getBlock();
 
         // Check sign format...
-        if ($event->getLine(0) !== "") return;
+        //if ($event->getLine(0) !== "") return;
         if (!is_numeric($saleNum) or $saleNum <= 0) return;
         if (!is_numeric($price) or $price < 0) return;
         if ($pID === false) return;
-        if (($chest = $this->getSideChest($sign)) === false) return;
+        //if (($chest = $this->getSideChest($sign)) === false) return;
 
         $productName = $item->getName();
-		
-		
-		
+
         $event->setLine(0, TextFormat::WHITE.$shopOwner);
         $event->setLine(1, "B $saleNum");
         $event->setLine(2, ($price == 0? "FREE!": $price));
         $event->setLine(3, "$productName");
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
+		$event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
     }
 
     private function getSideChest(Position $pos){		
