@@ -39,6 +39,7 @@ class EventListener implements Listener
                         "signY" => $block->getY(),
                         "signZ" => $block->getZ()
                     ])) === false) return;
+				$event->setCancelled();
                 if ($shopInfo['shopOwner'] === $player->getName()) {
                     $player->sendMessage(TextFormat::RED."Cannot buy from your own shop");
                     return;
@@ -57,7 +58,7 @@ class EventListener implements Listener
                 $itemNum = 0;
                 $pID = $shopInfo['productID'];
                 $pMeta = $shopInfo['productMeta'];
-				$productName = Item::fromString($pID, $pMeta)->getName();
+				$productName = Item::fromString($pID.":".$pMeta)->getName();
                 for ($i = 0; $i < $chest->getSize(); $i++) {
                     $item = $chest->getInventory()->getItem($i);
                     // use getDamage() method to get metadata of item
@@ -174,7 +175,7 @@ class EventListener implements Listener
         //$productData = explode(":", $event->getLine(3));
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
-			$player->sendMessage(TextFormat::RED."Invalid item name or ID");
+			$event->player->sendMessage(TextFormat::RED."Invalid item name or ID");
 			$event->setCancelled();
 			return;
 		}
