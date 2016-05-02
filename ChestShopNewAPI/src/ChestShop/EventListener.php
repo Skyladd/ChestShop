@@ -187,7 +187,7 @@ class EventListener implements Listener
 			
 			//This statement is only reachable if the player eithe rowns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
-			$this->plugin->getServer()->getLogger()->debug("{$shopInfo["shopOwner"]} removed their shop");
+			$this->plugin->getServer()->getLogger()->debug("A player removed a shop");
 				
 			return;
 		}
@@ -266,7 +266,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$event->getPlayer()->getName()->plugin->getServer()->getLogger()->debug("$player made a shop");
+		$this->plugin->getServer()->getLogger()->debug("A player made a shop");
 		return;
 	}
 
