@@ -185,7 +185,7 @@ class EventListener implements Listener
 		if ($shopInfo !== false) {
 			
 			if ($shopInfo['shopOwner'] !== strtolower($player->getName()) and !$player->hasPermission("chestshop.manager")){
-				$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer->getName()}$player tried to break a players shop");
+				$this->plugin->getServer()->getLogger()->debug("$player tried to break a players shop");
 				$event->setCancelled();
 				return;
 			}
@@ -262,7 +262,7 @@ class EventListener implements Listener
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
 		if (($chest = $this->getSideChest($sign)) === false) return;
-
+		$player = $event->getPlayer90->getName();
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
 		$event->setLine(1, "B $saleNum");
