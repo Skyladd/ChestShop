@@ -104,7 +104,7 @@ class EventListener implements Listener
 				$price = $shopInfo['price'];
 				$saleNum = $shopInfo['saleNum'];
 				if ($itemNum < $saleNum) {
-					//Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
+					// Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
 						$p->sendMessage("Your $productName shop is out of stock");
 					}
@@ -191,7 +191,7 @@ class EventListener implements Listener
 				return;
 			}
 			
-			//This statement is only reachable if the player either owns the shop or has permission to destroy any shop.
+			// This statement is only reachable if the player either owns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
 			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} removed {$shopInfo['shopOwner']}'s shop");
 			return;
@@ -223,8 +223,8 @@ class EventListener implements Listener
 			default:
 				return;
 		}
-		//This statement will only be reachable if the block is a potential Shop block
-		//This method will then decide if the block is a shop block or not, and handle permissions and ownership
+		// This statement will only be reachable if the block is a potential Shop block
+		// This method will then decide if the block is a shop block or not, and handle permissions and ownership
 		// Saves unnecessarily replicated code :P
 		$this->plugin->getServer()->getLogger()->debug("Handling chest/sign destroy event");
 		$this->destroyByCondition($event, $condition);
@@ -240,7 +240,7 @@ class EventListener implements Listener
 		];
 		$shopInfo = $this->databaseManager->selectByCondition($condition);
 		if ($shopInfo !== false){
-			//Anti-spam mechanism triggered, cancel event for a shop that is already registered
+			// Anti-spam mechanism triggered, cancel event for a shop that is already registered
 			// This fixes the occasional bug where the sign text resets to what the player typed onto it when it was made
 			$this->plugin->getServer()->getLogger()->debug("Anti-spam mechanism triggered, cancelling event to prevent reverting sign text");				
 			$event->setCancelled();
@@ -248,8 +248,8 @@ class EventListener implements Listener
 		}
 		
 		$shopOwner = strtolower($event->getPlayer()->getName());
-		$saleNum = $event->getLine(1);
 		$price = $event->getLine(2);
+		$saleNum = $event->getLine(1);
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
 			return;
@@ -263,11 +263,11 @@ class EventListener implements Listener
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
 		if (($chest = $this->getSideChest($sign)) === false) return;
-		
+		// Set sign format
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
-		$event->setLine(1, "B $saleNum");
-		$event->setLine(2, ($price == 0? "FREE" : $price));
+		$event->setLine(1, "$saleNum");
+		$event->setLine(2, ($price == 0? "FREE" : "B $price$"));
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
@@ -275,7 +275,7 @@ class EventListener implements Listener
 		return;
 	}
 
-//Where sign can be placed for usable shop
+// Where sign can be placed for usable shop
 // This can also be used for the double chest mechanism :P
 // This has potentially serious issues though, because what if you place a sign between 2 chests? Which one does it pick?
 // Possibly not the one the player intends, this will need refinement.
