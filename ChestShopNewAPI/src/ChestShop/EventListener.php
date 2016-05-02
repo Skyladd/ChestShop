@@ -77,6 +77,7 @@ class EventListener implements Listener
 				if($player->getGamemode() == 1){
 					$player->sendMessage("You can't buy in creative");
 					$event->setCancelled();
+					$this->plugin->getServer()->getLogger()->debug("A player tried buying in creative mode");
 					return;
 				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
@@ -86,6 +87,7 @@ class EventListener implements Listener
 				}
 				if ($buyerMoney < $shopInfo['price']) {
 					$player->sendMessage("Not enough money");
+					$this->plugin->getServer()->getLogger()->debug("$player didn't have enough money to buy");
 					return;
 				}
 				/** @var TileChest $chest */
@@ -108,6 +110,7 @@ class EventListener implements Listener
 					}
 					if($itemNum == 0){
 						$player->sendMessage("This shop is out of stock");
+						$this->plugin->getServer()->getLogger()->debug("$player's shop is out of stock");
 						return;
 					}else{
 						//Not enough stock to make a full sale, make partial sale instead
@@ -137,6 +140,7 @@ class EventListener implements Listener
 				$player->sendMessage("Bought {$saleNum} $productName for {$price}$");
 				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
 					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}$");
+					$this->plugin->getServer()->getLogger()->debug("$player bought from another player");
 				}
 				break;
 
@@ -161,6 +165,7 @@ class EventListener implements Listener
 					if($player->getGamemode() == 1){
 						$player->sendMessage("You can't stock in creative");
 						$event->setCancelled();
+						$this->plugin->getServer()->getLogger()->debug("A player tried stocking in creative");
 						return;
 					}
 				}
@@ -185,10 +190,9 @@ class EventListener implements Listener
 				return;
 			}
 			
-			//This statement is only reachable if the player eithe rowns the shop or has permission to destroy any shop.
+			//This statement is only reachable if the player either owns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
-			$this->plugin->getServer()->getLogger()->debug("A player removed a shop");
-				
+			$this->plugin->getServer()->getLogger()->debug("$player with chestshop.manager permissions removed a shop");
 			return;
 		}
 	}
@@ -266,7 +270,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$this->plugin->getServer()->getLogger()->debug("A player made a shop");
+		$this->plugin->getServer()->getLogger()->debug("$player made a shop");
 		return;
 	}
 
