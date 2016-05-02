@@ -153,8 +153,8 @@ class EventListener implements Listener
 				]);
 				if($shopInfo !== false){
 					if($player->hasPermission('chestshop.manager')){
-						return;
 						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} opened {$shopInfo['shopOwner']}'s shop ");
+						return;
 					}
 					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
