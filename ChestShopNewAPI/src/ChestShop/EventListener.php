@@ -266,7 +266,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$this->plugin->getServer()->getLogger()->debug("{$shopInfo["shopOwner"]} made a shop");
+		$this->plugin->getPlayer()->getName()->getServer()->getLogger()->debug("$player made a shop");
 		return;
 	}
 
