@@ -267,7 +267,7 @@ class EventListener implements Listener
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
 		$event->setLine(1, "$saleNum");
-		$event->setLine(2, ($price == 0? "FREE" : "B $price$"));
+		$event->setLine(2, ($price == 0? "FREE" : "B $price{getMoneySymbol()}"));
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
