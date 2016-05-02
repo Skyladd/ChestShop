@@ -154,6 +154,7 @@ class EventListener implements Listener
 				if($shopInfo !== false){
 					if($player->hasPermission('chestshop.manager')){
 						return;
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} opened {$shopInfo['shopOwner']}'s shop ");
 					}
 					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
@@ -165,7 +166,7 @@ class EventListener implements Listener
 					if($player->getGamemode() == 1){
 						$player->sendMessage("You can't stock in creative");
 						$event->setCancelled();
-						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()}r tried stocking in creative");
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried stocking in creative");
 						return;
 					}
 				}
