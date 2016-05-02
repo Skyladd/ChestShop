@@ -262,7 +262,7 @@ class EventListener implements Listener
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
 		if (($chest = $this->getSideChest($sign)) === false) return;
-		$player = $event->getPlayer90->getName();
+		
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
 		$event->setLine(1, "B $saleNum");
@@ -270,7 +270,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$this->plugin->getServer()->getLogger()->debug("$player made a shop");
+		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName();} made a shop");
 		return;
 	}
 
