@@ -56,6 +56,11 @@ class EventListener implements Listener
 		// Ban making double-chest ChestShops as an interim measure
 		// I can't be bothered writing all the excess extra code you'd need to set up double shops properly
 		// ... not yet, anyway
+		if($event->getAction() == $event::LEFT_CLICK_BLOCK){
+			$this->plugin->getServer()->getLogger()->debug("Player left-clicked, ignoring");
+			return;
+		}
+		
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
 
@@ -219,6 +224,7 @@ class EventListener implements Listener
 		$this->plugin->getServer()->getLogger()->debug("Handling chest/sign destroy event");
 		$this->destroyByCondition($event, $condition);
 	}
+	
 //Normal sign transform to shop sign
 	public function onSignChange(SignChangeEvent $event){
 		$sign = $event->getBlock();
