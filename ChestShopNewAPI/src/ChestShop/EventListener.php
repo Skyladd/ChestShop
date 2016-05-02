@@ -192,7 +192,7 @@ class EventListener implements Listener
 			
 			//This statement is only reachable if the player either owns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
-			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} with chestshop.manager permissions removed a shop");
+			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} removed a shop that was either theirs or they had chestshop.manager permissions");
 			return;
 		}
 	}
