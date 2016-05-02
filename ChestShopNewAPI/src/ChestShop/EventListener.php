@@ -185,7 +185,7 @@ class EventListener implements Listener
 		if ($shopInfo !== false) {
 			
 			if ($shopInfo['shopOwner'] !== strtolower($player->getName()) and !$player->hasPermission("chestshop.manager")){
-				$this->plugin->getServer()->getLogger()->debug("$player tried to break a players shop");
+				$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer->getName()}$player tried to break a players shop");
 				$event->setCancelled();
 				return;
 			}
