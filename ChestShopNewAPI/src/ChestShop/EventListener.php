@@ -46,7 +46,7 @@ class EventListener implements Listener
 		$block = $event->getBlock();
 		if($this->getSideChest($block) !== false and $block->getID() == Block::CHEST){
 			//A nearby chest was found, prevent the chest being placed
-			$event->getPlayer()->sendMessage(TextFormat::RED."Double ChestShops are not currently supported");
+			$event->getPlayer()->sendMessage(TextFormat::RED."Double ChestShops are not yet supported");
 			$event->setCancelled();
 		}
 	}
@@ -75,7 +75,7 @@ class EventListener implements Listener
 					return;
 				}
 				if($player->getGamemode() == 1){
-					$player->sendMessage(TextFormat::RED."You can't buy in creative");
+					$player->sendMessage("You can't buy in creative");
 					$event->setCancelled();
 					return;
 				}
@@ -85,7 +85,7 @@ class EventListener implements Listener
 					return;
 				}
 				if ($buyerMoney < $shopInfo['price']) {
-					$player->sendMessage(TextFormat::RED."Not enough money");
+					$player->sendMessage("Not enough money");
 					return;
 				}
 				/** @var TileChest $chest */
@@ -104,10 +104,10 @@ class EventListener implements Listener
 				if ($itemNum < $saleNum) {
 					//Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendMessage(TextFormat::RED."Your $productName shop is out of stock");
+						$p->sendMessage("Your $productName shop is out of stock");
 					}
 					if($itemNum == 0){
-						$player->sendMessage(TextFormat::RED."This shop is out of stock");
+						$player->sendMessage("This shop is out of stock");
 						return;
 					}else{
 						//Not enough stock to make a full sale, make partial sale instead
@@ -134,13 +134,14 @@ class EventListener implements Listener
 				}
 				$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
 
-				$player->sendMessage(TextFormat::GREEN."Bought {$saleNum} $productName for {$price}$");
+				$player->sendMessage("Bought {$saleNum} $productName for {$price}$");
 				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-					$p->sendMessage(TextFormat::WHITE."{$player->getName()} bought {$saleNum} $productName for {$price}$");
+					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}$");
 				}
 				break;
 
 			case Block::CHEST:
+			case Block::TRAPPED_CHEST:
 				$shopInfo = $this->databaseManager->selectByCondition([
 					"chestX" => $block->getX(),
 					"chestY" => $block->getY(),
@@ -158,7 +159,7 @@ class EventListener implements Listener
 						return;
 					}
 					if($player->getGamemode() == 1){
-						$player->sendMessage(TextFormat::RED."You can't stock in creative");
+						$player->sendMessage("You can't stock in creative");
 						$event->setCancelled();
 						return;
 					}
@@ -179,14 +180,14 @@ class EventListener implements Listener
 		if ($shopInfo !== false) {
 			
 			if ($shopInfo['shopOwner'] !== strtolower($player->getName()) and !$player->hasPermission("chestshop.manager")){
-				$player->sendMessage(TextFormat::RED."You cannot destroy others' shops");
+				$this->plugin->getServer()->getLogger()->debug("$player tried to break a players shop");
 				$event->setCancelled();
 				return;
 			}
 			
 			//This statement is only reachable if the player eithe rowns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
-			$player->sendMessage(TextFormat::GREEN."Shop successfully removed");
+			$this->plugin->getServer()->getLogger()->debug("$player removed their shop");
 				
 			return;
 		}
@@ -207,6 +208,7 @@ class EventListener implements Listener
 				];
 				break;
 			case Block::CHEST:
+			case Block::TRAPPED_CHEST:	
 				$condition = [
 					"chestX" => $block->getX(),
 					"chestY" => $block->getY(),
@@ -264,7 +266,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
+		$this->plugin->getServer()->getLogger()->debug("$player made a shop");
 		return;
 	}
 
@@ -273,6 +275,18 @@ class EventListener implements Listener
 // This has potentially serious issues though, because what if you place a sign between 2 chests? Which one does it pick?
 // Possibly not the one the player intends, this will need refinement.
 	private function getSideChest(Position $pos){
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ()));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() + 1, $pos->getY(), $pos->getZ()));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() - 1, $pos->getY(), $pos->getZ()));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() + 1));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
+		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() - 1));
+		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
 		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
 		if ($block->getID() === Block::CHEST) return $block;
 		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ()));
