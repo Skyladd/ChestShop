@@ -270,7 +270,7 @@ class EventListener implements Listener
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
-		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName();} made a shop");
+		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
 	}
 
