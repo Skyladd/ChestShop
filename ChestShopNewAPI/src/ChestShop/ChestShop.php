@@ -14,6 +14,7 @@ class ChestShop extends PluginBase
 {
     public function onLoad()
     {
+        $this->getLogger()->info(TextFormat::GREEN . "Loading...");
     }
 
     public function onEnable()
@@ -31,6 +32,7 @@ class ChestShop extends PluginBase
 
     public function onDisable()
     {
+        $this->getLogger()->info(TextFormat::RED . "Disabled");
     }
 
     public function onCommand(CommandSender $sender, Command $command, $label, array $args)

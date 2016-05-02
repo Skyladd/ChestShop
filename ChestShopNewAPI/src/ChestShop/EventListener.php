@@ -13,8 +13,8 @@ use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Chest as TileChest;
 use pocketmine\utils\TextFormat;
-
-
+//Don't touch |
+//            v
 class EventListener implements Listener
 {
     private $plugin;
@@ -25,7 +25,10 @@ class EventListener implements Listener
         $this->plugin = $plugin;
         $this->databaseManager = $databaseManager;
     }
+//Dont touch ^
+//           |
 
+//Player touch sign and chest events
     public function onPlayerInteract(PlayerInteractEvent $event)
     {
         $block = $event->getBlock();
@@ -42,6 +45,11 @@ class EventListener implements Listener
 				$event->setCancelled();
                 if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
                     return;
+                }
+                if($player->getGamemode() == 1){
+		$player->sendMessage(TextFormat::RED."You can't buy in creative");
+                        $event->setCancelled();
+                        return;
                 }
                 $buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
                 if (!is_numeric($buyerMoney)) { // Probably $buyerMoney is instance of SimpleError
@@ -76,7 +84,6 @@ class EventListener implements Listener
 						//Not enough stock to make a full sale, make partial sale instead
 						$price = ($price/$saleNum)*$itemNum;
 						$saleNum = $itemNum;
-						$player->sendMessage(TextFormat::RED."Making a partial sale, not enough stock left");  
 					}
                 }
 
@@ -112,12 +119,20 @@ class EventListener implements Listener
                     "chestZ" => $block->getZ()
                 ]);
 				if($shopInfo !== false){
-					if($player->getGamemode() == 1){
-						$player->sendMessage(TextFormat::RED."You can't stock in creative");
-                        $event->setCancelled();
-					}
+                    if($player->hasPermission('chestshop.manager')){
+                     return;
+                      }
 					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
 						$event->setCancelled();
+						return;
+					}
+                     if($player->hasPermission('chestshop.creative')){
+                     return;
+                      }
+                       if($player->getGamemode() == 1){
+						$player->sendMessage(TextFormat::RED."You can't stock in creative");
+                        $event->setCancelled();
+                        return;
 					}
 				}
                 break;
@@ -126,7 +141,7 @@ class EventListener implements Listener
                 break;
         }
     }
-
+//Protect chests and signs
     public function onPlayerBreakBlock(BlockBreakEvent $event)
     {
         $block = $event->getBlock();
@@ -142,15 +157,23 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
+                    if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
+                    }
                     if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
-                        $player->sendMessage(TextFormat::RED."Shop closed");
+                        return;
+                        if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
+                  }
                     }
                 }
                 break;
-
+          switch ($block->getID()) {
             case Block::CHEST:
                 $condition = [
                     "chestX" => $block->getX(),
@@ -159,12 +182,15 @@ class EventListener implements Listener
                 ];
                 $shopInfo = $this->databaseManager->selectByCondition($condition);
                 if ($shopInfo !== false) {
-					
+                    }
                     if ($shopInfo['shopOwner'] !== strtolower($player->getName())){
                         $event->setCancelled();
                     } else {
                         $this->databaseManager->deleteByCondition($condition);
-                        $player->sendMessage(TextFormat::RED."Shop Closed");
+                        return;
+                        if($player->hasPermission('chestshop.manager')){
+                        $this->databaseManager->deleteByCondition($condition);
+                     return;
                     }
                 }
                 break;
@@ -173,7 +199,8 @@ class EventListener implements Listener
                 break;
         }
     }
-
+}
+//Normal sign transform to shop sign
     public function onSignChange(SignChangeEvent $event)
     {
 		/*if(strtolower($event->getLine(0)) != "[shop]"){
@@ -212,8 +239,9 @@ class EventListener implements Listener
 
         $this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
         $event->getPlayer()->sendMessage(TextFormat::GREEN."Shop created successfully");
+        return;
     }
-
+//Where sign can be placed for useable shop
     private function getSideChest(Position $pos){		
         $block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
         if ($block->getID() === Block::CHEST) return $block;
