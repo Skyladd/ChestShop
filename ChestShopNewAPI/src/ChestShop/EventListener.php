@@ -42,20 +42,20 @@ class EventListener implements Listener
 	}
 
 // Stop double ChestShops being made (for the meantime) otherwise anyone can access the entire chest by opening the non-locked side
-	public function onBlockPlaced(BlockPlaceEvent $event){
-		$block = $event->getBlock();
-		if($this->getSideChest($block) !== false and $block->getID() == Block::CHEST){
+	//public function onBlockPlaced(BlockPlaceEvent $event){
+		//$block = $event->getBlock();
+		//if($this->getSideChest($block) !== false and $block->getID() == Block::CHEST){
 			//A nearby chest was found, prevent the chest being placed
-			$event->getPlayer()->sendMessage(TextFormat::RED."Double ChestShops are not yet supported");
-			$event->setCancelled();
-		}
-	}
+			//$event->getPlayer()->sendMessage(TextFormat::RED."Double ChestShops are not yet supported");
+			//$event->setCancelled();
+		//}
+	//}
 	
 //Player touch sign and chest events
 	public function onPlayerInteract(PlayerInteractEvent $event){
 		// Ignore left-click events, fixes spam of Bought blah blah messages when destroying a shop
 		if($event->getAction() == $event::LEFT_CLICK_BLOCK){
-			$this->plugin->getServer()->getLogger()->debug("Player left-clicked, ignoring");
+			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} left-clicked, ignoring");
 			return;
 		}
 		
@@ -77,7 +77,7 @@ class EventListener implements Listener
 				if($player->getGamemode() == 1){
 					$player->sendMessage("You can't buy in creative");
 					$event->setCancelled();
-					$this->plugin->getServer()->getLogger()->debug("A player tried buying in creative mode");
+					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
 					return;
 				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
@@ -87,7 +87,7 @@ class EventListener implements Listener
 				}
 				if ($buyerMoney < $shopInfo['price']) {
 					$player->sendMessage("Not enough money");
-					$this->plugin->getServer()->getLogger()->debug("$player didn't have enough money to buy");
+					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} didn't have enough money to buy");
 					return;
 				}
 				/** @var TileChest $chest */
@@ -110,7 +110,7 @@ class EventListener implements Listener
 					}
 					if($itemNum == 0){
 						$player->sendMessage("This shop is out of stock");
-						$this->plugin->getServer()->getLogger()->debug("$player's shop is out of stock");
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()}'s shop is out of stock");
 						return;
 					}else{
 						//Not enough stock to make a full sale, make partial sale instead
@@ -140,7 +140,7 @@ class EventListener implements Listener
 				$player->sendMessage("Bought {$saleNum} $productName for {$price}$");
 				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
 					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}$");
-					$this->plugin->getServer()->getLogger()->debug("$player bought from another player");
+					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
 				}
 				break;
 
@@ -165,7 +165,7 @@ class EventListener implements Listener
 					if($player->getGamemode() == 1){
 						$player->sendMessage("You can't stock in creative");
 						$event->setCancelled();
-						$this->plugin->getServer()->getLogger()->debug("A player tried stocking in creative");
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()}r tried stocking in creative");
 						return;
 					}
 				}
@@ -185,14 +185,14 @@ class EventListener implements Listener
 		if ($shopInfo !== false) {
 			
 			if ($shopInfo['shopOwner'] !== strtolower($player->getName()) and !$player->hasPermission("chestshop.manager")){
-				$this->plugin->getServer()->getLogger()->debug("$player tried to break a players shop");
+				$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried to break a players shop");
 				$event->setCancelled();
 				return;
 			}
 			
 			//This statement is only reachable if the player either owns the shop or has permission to destroy any shop.
 			$this->databaseManager->deleteByCondition($condition);
-			$this->plugin->getServer()->getLogger()->debug("$player with chestshop.manager permissions removed a shop");
+			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} with chestshop.manager permissions removed a shop");
 			return;
 		}
 	}
