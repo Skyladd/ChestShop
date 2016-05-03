@@ -51,7 +51,14 @@ class EventListener implements Listener
 		//}
 	//}
 	
-//Player touch sign and chest events
+//  ____  _               _____           
+// / ___|(_) __ _ _ __   |_   _|_ _ _ __  
+// \___ \| |/ _` | '_ \    | |/ _` | '_ \ 
+//  ___) | | (_| | | | |   | | (_| | |_) |
+// |____/|_|\__, |_| |_|   |_|\__,_| .__/ 
+//          |___/                  |_|    
+
+
 	public function onPlayerInteract(PlayerInteractEvent $event){
 		// Ignore left-click events, fixes spam of Bought blah blah messages when destroying a shop
 		if($event->getAction() == $event::LEFT_CLICK_BLOCK){
@@ -61,7 +68,7 @@ class EventListener implements Listener
 		
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
-
+ 
 		switch ($block->getID()) {
 			case Block::SIGN_POST:
 			case Block::WALL_SIGN:
@@ -143,7 +150,21 @@ class EventListener implements Listener
 					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
 				}
 				break;
+//  ____  _               _____             _____           _ 
+// / ___|(_) __ _ _ __   |_   _|_ _ _ __   | ____|_ __   __| |
+// \___ \| |/ _` | '_ \    | |/ _` | '_ \  |  _| | '_ \ / _` |
+//  ___) | | (_| | | | |   | | (_| | |_) | | |___| | | | (_| |
+// |____/|_|\__, |_| |_|   |_|\__,_| .__/  |_____|_| |_|\__,_|
+//          |___/                  |_|                        
 
+//   ____ _               _     _____           
+//  / ___| |__   ___  ___| |_  |_   _|_ _ _ __  
+// | |   | '_ \ / _ \/ __| __|   | |/ _` | '_ \ 
+// | |___| | | |  __/\__ \ |_    | | (_| | |_) |
+//  \____|_| |_|\___||___/\__|   |_|\__,_| .__/ 
+//                                       |_|    
+
+                            
 			case Block::CHEST:
 			case Block::TRAPPED_CHEST:
 				$shopInfo = $this->databaseManager->selectByCondition([
@@ -177,7 +198,22 @@ class EventListener implements Listener
 		}
 	}
 
-// Remove replicated code in onPlayerBreakBlock
+//   ____ _               _     _____             _____           _ 
+//  / ___| |__   ___  ___| |_  |_   _|_ _ _ __   | ____|_ __   __| |
+// | |   | '_ \ / _ \/ __| __|   | |/ _` | '_ \  |  _| | '_ \ / _` |
+// | |___| | | |  __/\__ \ |_    | | (_| | |_) | | |___| | | | (_| |
+//  \____|_| |_|\___||___/\__|   |_|\__,_| .__/  |_____|_| |_|\__,_|
+//                                       |_|                        
+
+
+//  ____                 _      ____  _                 
+// | __ ) _ __ ___  __ _| | __ / ___|| |__   ___  _ __  
+// |  _ \| '__/ _ \/ _` | |/ / \___ \| '_ \ / _ \| '_ \ 
+// | |_) | | |  __/ (_| |   <   ___) | | | | (_) | |_) |
+// |____/|_|  \___|\__,_|_|\_\ |____/|_| |_|\___/| .__/ 
+//                                               |_|    
+
+
 	private function destroyByCondition(&$event, $condition){
 		$this->plugin->getServer()->getLogger()->debug("destroyByCondition method fired");
 		
@@ -197,8 +233,19 @@ class EventListener implements Listener
 			return;
 		}
 	}
-	
-//Protect chests and signs
+//  ____                 _      ____  _                   _____           _ 
+// | __ ) _ __ ___  __ _| | __ / ___|| |__   ___  _ __   | ____|_ __   __| |
+// |  _ \| '__/ _ \/ _` | |/ / \___ \| '_ \ / _ \| '_ \  |  _| | '_ \ / _` |
+// | |_) | | |  __/ (_| |   <   ___) | | | | (_) | |_) | | |___| | | | (_| |
+// |____/|_|  \___|\__,_|_|\_\ |____/|_| |_|\___/| .__/  |_____|_| |_|\__,_|
+//                                               |_|                        
+//  ____            _            _      ____ _               _        _              _   ____  _             
+// |  _ \ _ __ ___ | |_ ___  ___| |_   / ___| |__   ___  ___| |_     / \   _ __   __| | / ___|(_) __ _ _ __  
+// | |_) | '__/ _ \| __/ _ \/ __| __| | |   | '_ \ / _ \/ __| __|   / _ \ | '_ \ / _` | \___ \| |/ _` | '_ \ 
+// |  __/| | | (_) | ||  __/ (__| |_  | |___| | | |  __/\__ \ |_   / ___ \| | | | (_| |  ___) | | (_| | | | |
+// |_|   |_|  \___/ \__\___|\___|\__|  \____|_| |_|\___||___/\__| /_/   \_\_| |_|\__,_| |____/|_|\__, |_| |_|
+//                                                                                               |___/       
+
 	public function onPlayerBreakBlock(BlockBreakEvent $event){
 		$this->plugin->getServer()->getLogger()->debug("BlockBreakEvent triggered");
 		$block = $event->getBlock();
@@ -229,8 +276,22 @@ class EventListener implements Listener
 		$this->plugin->getServer()->getLogger()->debug("Handling chest/sign destroy event");
 		$this->destroyByCondition($event, $condition);
 	}
-	
-//Normal sign transform to shop sign
+
+//  ____            _            _      ____ _               _        _              _   ____  _               _____           _ 
+// |  _ \ _ __ ___ | |_ ___  ___| |_   / ___| |__   ___  ___| |_     / \   _ __   __| | / ___|(_) __ _ _ __   | ____|_ __   __| |
+// | |_) | '__/ _ \| __/ _ \/ __| __| | |   | '_ \ / _ \/ __| __|   / _ \ | '_ \ / _` | \___ \| |/ _` | '_ \  |  _| | '_ \ / _` |
+// |  __/| | | (_) | ||  __/ (__| |_  | |___| | | |  __/\__ \ |_   / ___ \| | | | (_| |  ___) | | (_| | | | | | |___| | | | (_| |
+// |_|   |_|  \___/ \__\___|\___|\__|  \____|_| |_|\___||___/\__| /_/   \_\_| |_|\__,_| |____/|_|\__, |_| |_| |_____|_| |_|\__,_|
+//                                                                                               |___/         
+
+                  
+//  ____  _               _____       ____  _                 
+// / ___|(_) __ _ _ __   |_   _|__   / ___|| |__   ___  _ __  
+// \___ \| |/ _` | '_ \    | |/ _ \  \___ \| '_ \ / _ \| '_ \ 
+//  ___) | | (_| | | | |   | | (_) |  ___) | | | | (_) | |_) |
+// |____/|_|\__, |_| |_|   |_|\___/  |____/|_| |_|\___/| .__/ 
+//          |___/                                      |_|    
+
 	public function onSignChange(SignChangeEvent $event){
 		$sign = $event->getBlock();
 		$condition = [
@@ -254,10 +315,22 @@ class EventListener implements Listener
 		if($item->getID() < 1){ //Invalid item ID/name
 			return;
 		}
+//  ____  _               _____       ____  _                   _____           _ 
+// / ___|(_) __ _ _ __   |_   _|__   / ___|| |__   ___  _ __   | ____|_ __   __| |
+// \___ \| |/ _` | '_ \    | |/ _ \  \___ \| '_ \ / _ \| '_ \  |  _| | '_ \ / _` |
+//  ___) | | (_| | | | |   | | (_) |  ___) | | | | (_) | |_) | | |___| | | | (_| |
+// |____/|_|\__, |_| |_|   |_|\___/  |____/|_| |_|\___/| .__/  |_____|_| |_|\__,_|
+//          |___/                                      |_|                        
+
+//  ____  _               _____                          _   
+// / ___|(_) __ _ _ __   |  ___|__  _ __ _ __ ___   __ _| |_ 
+// \___ \| |/ _` | '_ \  | |_ / _ \| '__| '_ ` _ \ / _` | __|
+//  ___) | | (_| | | | | |  _| (_) | |  | | | | | | (_| | |_ 
+// |____/|_|\__, |_| |_| |_|  \___/|_|  |_| |_| |_|\__,_|\__|
+//          |___/               
 		$pID = $item->getID();
 		$pMeta = $item->getDamage();
-
-		// Check sign format...
+                             
 		if ($event->getLine(0) !== "") return;
 		if (!is_numeric($saleNum) or $saleNum <= 0) return;
 		if (!is_numeric($price) or $price < 0) return;
@@ -274,6 +347,12 @@ class EventListener implements Listener
 		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
 	}
+//  ____  _               _____                          _     _____           _ 
+// / ___|(_) __ _ _ __   |  ___|__  _ __ _ __ ___   __ _| |_  | ____|_ __   __| |
+// \___ \| |/ _` | '_ \  | |_ / _ \| '__| '_ ` _ \ / _` | __| |  _| | '_ \ / _` |
+//  ___) | | (_| | | | | |  _| (_) | |  | | | | | | (_| | |_  | |___| | | | (_| |
+// |____/|_|\__, |_| |_| |_|  \___/|_|  |_| |_| |_|\__,_|\__| |_____|_| |_|\__,_|
+//          |___/                                                                
 
 // Where sign can be placed for usable shop
 // This can also be used for the double chest mechanism :P
