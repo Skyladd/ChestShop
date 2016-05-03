@@ -13,6 +13,7 @@ use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Chest as TileChest;
 use pocketmine\utils\TextFormat;
+use MassiveEconomy\MassiveEconomyAPI;
 
 //Don't touch |
 //            v
@@ -143,12 +144,25 @@ class EventListener implements Listener
 					}
 				}
 				$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
-
-				$player->sendMessage("Bought {$saleNum} $productName for {$price}$");
-				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}$");
-					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
+				if ($saleNum > 0){
+				$player->sendMessage("Bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
 				}
+				if ($saleNum < 1){
+				$player->sendMessage("Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+				}
+				if ($saleNum < 1){
+				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+					$p->sendMessage("{$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+				}
+				}
+				if ($saleNum > 0){
+				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
+				return;
+				}
+				}
+
 				break;
 //  ____  _               _____             _____           _ 
 // / ___|(_) __ _ _ __   |_   _|_ _ _ __   | ____|_ __   __| |
@@ -332,15 +346,15 @@ class EventListener implements Listener
 		$pMeta = $item->getDamage();
                              
 		if ($event->getLine(0) !== "") return;
-		if (!ctype_digit($saleNum) or $saleNum <= 0) return;
+		if (!ctype_digit($saleNum)) return;
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
 		if (($chest = $this->getSideChest($sign)) === false) return;
 		// Set sign format
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
-		$event->setLine(1, "$saleNum" );
-		$event->setLine(2, ($price == 0? "FREE" : "B $price$"));
+		$event->setLine(1, ($saleNum == 0? "DONATE" : "$saleNum"));
+		$event->setLine(2, ($price == 0? "FREE" : "B $price" . MassiveEconomyAPI::getInstance()->getMoneySymbol()));
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
