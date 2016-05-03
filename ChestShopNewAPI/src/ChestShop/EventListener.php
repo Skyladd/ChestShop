@@ -332,14 +332,14 @@ class EventListener implements Listener
 		$pMeta = $item->getDamage();
                              
 		if ($event->getLine(0) !== "") return;
-		if (!is_numeric($saleNum) or $saleNum <= 0) return;
+		if (!ctype_digit($saleNum) or $saleNum <= 0) return;
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
 		if (($chest = $this->getSideChest($sign)) === false) return;
 		// Set sign format
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
-		$event->setLine(1, "$saleNum");
+		$event->setLine(1, "$saleNum" );
 		$event->setLine(2, ($price == 0? "FREE" : "B $price$"));
 		$event->setLine(3, "$productName");
 
