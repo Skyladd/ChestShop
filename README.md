@@ -24,7 +24,7 @@
   | 1 | Blank(You must not write anything) |
   | 2 | Number you want to sell per one transaction |
   | 3 | Price |
-  | 4 | Item ID |
+  | 4 | Item Name/ID |
   
 # Buying and extra info
 
