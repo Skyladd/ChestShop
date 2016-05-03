@@ -5,7 +5,7 @@
 
 2.  Restart or reload your server
 
-3. Download a pre-built phar file [here](https://docs.google.com/uc?authuser=0&id=0B9EFuluan--kUjcwZTJlQmZfUG8&export=download)
+3. Download a pre-built phar file [here](https://docs.google.com/uc?authuser=0&id=0B9EFuluan--ka3hRbXJPeDlIbjg&export=download)
 
 # How to open your chest shop
 
