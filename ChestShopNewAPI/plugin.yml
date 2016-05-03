@@ -14,3 +14,6 @@ permissions:
  chestshop.creative:
   default: op
   description: "Allows filling shops in creative mode"
+ chestshop.manager:
+  default: op
+  description: "Allows breaking and opening others shops"
