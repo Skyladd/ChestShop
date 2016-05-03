@@ -122,7 +122,7 @@ class EventListener implements Listener
 						return;
 					}else{
 						//Not enough stock to make a full sale, make partial sale instead
-						$price = ($price/$saleNum)*$itemNum;
+						$price = round((($price/$saleNum)*$itemNum),2);
 						$saleNum = $itemNum;
 					}
 				}
@@ -350,7 +350,7 @@ class EventListener implements Listener
 		$event->setLine(2, ($price == 0? "FREE" : "B $price" . MassiveEconomyAPI::getInstance()->getMoneySymbol()));
 		$event->setLine(3, "$productName");
 
-		$this->databaseManager->registerShop($shopOwner, $saleNum, $price, $pID, $pMeta, $sign, $chest);
+		$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $chest);
 		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
 	}
