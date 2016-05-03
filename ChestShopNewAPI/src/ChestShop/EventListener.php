@@ -145,24 +145,17 @@ class EventListener implements Listener
 				}
 				$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
 				if ($saleNum > 0){
-				$player->sendMessage("Bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					$player->sendMessage("Bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+						$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
+					}
+				}else{
+					$player->sendMessage("Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+						$p->sendMessage("{$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					}
 				}
-				if ($saleNum < 1){
-				$player->sendMessage("Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-				}
-				if ($saleNum < 1){
-				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-					$p->sendMessage("{$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-				}
-				}
-				if ($saleNum > 0){
-				if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-					$p->sendMessage("{$player->getName()} bought {$saleNum} $productName for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
-				return;
-				}
-				}
-
 				break;
 //  ____  _               _____             _____           _ 
 // / ___|(_) __ _ _ __   |_   _|_ _ _ __   | ____|_ __   __| |
