@@ -30,7 +30,7 @@
 
 1. You do not need to include "$" in the price
 
-2. If you want to make a donation sign so players can donate you money make the price 0 
+2. If you want to make a donation sign so players can donate you money make the item amount 0 
 
 ![Locate a sign next to Chest](https://github.com/Skyladd/ChestShop/blob/master/Images/Screenshot_2016-05-02-14-06-36.png)
 
