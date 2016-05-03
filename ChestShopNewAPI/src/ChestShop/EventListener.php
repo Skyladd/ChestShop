@@ -347,7 +347,7 @@ class EventListener implements Listener
 		$productName = $item->getName();
 		$event->setLine(0, TextFormat::WHITE.$event->getPlayer()->getName());
 		$event->setLine(1, ($saleNum == 0? "DONATE" : "$saleNum"));
-		$event->setLine(2, ($price == 0? "FREE" : "B $price" . MassiveEconomyAPI::getInstance()->getMoneySymbol()));
+		$event->setLine(2, ($price == 0? "FREE" : "B ".round($price,2) . MassiveEconomyAPI::getInstance()->getMoneySymbol()));
 		$event->setLine(3, "$productName");
 
 		$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $chest);
