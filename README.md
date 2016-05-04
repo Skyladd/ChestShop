@@ -32,6 +32,8 @@
 
 2. If you want to make a donation sign so players can donate you money make the item amount 0 
 
+3. If you want to sell an item for free make the cost 0
+
 ![Locate a sign next to Chest](https://github.com/Skyladd/ChestShop/blob/master/Images/Screenshot_2016-05-02-14-06-36.png)
 
 3. The item names are not case sensitive, but for items such as birch logs you will need to include the meta data for the item example.. log:2
