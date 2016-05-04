@@ -339,6 +339,9 @@ class EventListener implements Listener
 		$pMeta = $item->getDamage();
                              
 		if ($event->getLine(0) !== "") return;
+		if ($price == 0 and $saleNum == 0){
+		return;
+		}
 		if (!ctype_digit($saleNum)) return;
 		if (!is_numeric($price) or $price < 0) return;
 		if ($pID === false) return;
