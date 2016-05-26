@@ -83,18 +83,18 @@ class EventListener implements Listener
 					return;
 				}
 				if($player->getGamemode() == 1){
-					$player->sendMessage("§a[Shop]§r You can't buy in creative");
+					$player->sendTip("§a[Shop]§r You can't buy in creative");
 					$event->setCancelled();
 					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
 					return;
 				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
 				if (!is_numeric($buyerMoney)) { // Probably $buyerMoney is instance of SimpleError
-					$player->sendMessage("§a[Shop]§r Couldn't acquire your money data!");
+					$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
 					return;
 				}
 				if ($buyerMoney < $shopInfo['price']) {
-					$player->sendMessage("§a[Shop]§r Not enough money");
+					$player->sendTip("§a[Shop]§r Not enough money");
 					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} didn't have enough money to buy");
 					return;
 				}
@@ -114,10 +114,10 @@ class EventListener implements Listener
 				if ($itemNum < $saleNum) {
 					// Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendMessage("§a[Shop]§r Your $productName shop is out of stock");
+						$p->sendTip("§a[Shop]§r Your $productName shop is out of stock");
 					}
 					if($itemNum == 0){
-						$player->sendMessage("§a[Shop]§r This shop is out of stock");
+						$player->sendTip("§a[Shop]§r This shop is out of stock");
 						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()}'s shop is out of stock");
 						return;
 					}else{
@@ -145,15 +145,15 @@ class EventListener implements Listener
 				}
 				$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
 				if ($saleNum > 0){
-					$player->sendMessage("§a[Shop]§r You bought {$saleNum} $productName from {$shopInfo["shopOwner"]} for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					$player->sendTip("§a[Shop]§r You bought {$saleNum} $productName from {$shopInfo["shopOwner"]} for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendMessage("§a[Shop]§r {$player->getName()} bought {$saleNum} $productName from you for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						$p->sendTip("§a[Shop]§r {$player->getName()} bought {$saleNum} $productName from you for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
 						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
 					}
 				}else{
-					$player->sendMessage("§a[Shop]§r Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+					$player->sendTip("§a[Shop]§r Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendMessage("§a[Shop]§r {$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						$p->sendTip("§a[Shop]§r {$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
 					}
 				}
 				break;
@@ -192,7 +192,7 @@ class EventListener implements Listener
 						return;
 					}
 					if($player->getGamemode() == 1){
-						$player->sendMessage("You can't stock in creative");
+						$player->sendTip("§a[Shop]§r You can't stock in creative");
 						$event->setCancelled();
 						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried stocking in creative");
 						return;
