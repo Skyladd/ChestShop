@@ -56,7 +56,7 @@ class EventListener implements Listener
 							"chestZ" => $chest->getZ()
 						];
 						$shopInfo = $this->databaseManager->selectByCondition($condition);
-						if($shopInfo["shopOwner"] !== false){
+						if($shopInfo["shopOwner"] !== true){
 							$event->setCancelled();
 							return;
 						}
