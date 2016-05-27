@@ -1,6 +1,6 @@
 name: ChestShop
 main: ChestShop\ChestShop
-version: 2.0.0
+version: 1.5.0
 api: [2.0.0]
 load: POSTWORLD
 author: Skyladd
