@@ -19,6 +19,8 @@ use MassiveEconomy\MassiveEconomyAPI;
 //            v
 class EventListener implements Listener
 {
+	const SUPPORTED_TYPES = [Block::CHEST, Block::TRAPPED_CHEST];
+	
 	private $plugin;
 	private $databaseManager;
 
@@ -42,15 +44,30 @@ class EventListener implements Listener
 		}
 	}
 
-// Stop double ChestShops being made (for the meantime) otherwise anyone can access the entire chest by opening the non-locked side
-	//public function onBlockPlaced(BlockPlaceEvent $event){
-		//$block = $event->getBlock();
-		//if($this->getSideChest($block) !== false and $block->getID() == Block::CHEST){
-			//A nearby chest was found, prevent the chest being placed
-			//$event->getPlayer()->sendMessage(TextFormat::RED."Double ChestShops are not yet supported");
-			//$event->setCancelled();
-		//}
-	//}
+	public function onBlockPlaced(BlockPlaceEvent $event){
+		$block = $event->getBlock();
+		foreach(self::SUPPORTED_TYPES as $type){
+			if($block->getID() === $type){
+				if(($chests = $this->getSideChest($block)) !== false){
+					foreach($chests as $chest){
+						$condition = [
+							"chestX" => $chest->getX(),
+							"chestY" => $chest->getY(),
+							"chestZ" => $chest->getZ()
+						];
+						$shopInfo = $this->databaseManager->selectByCondition($condition);
+						if($shopInfo !== false){
+							$event->getPlayer()->sendTip("You can't place chests by ChestShops");
+							$event->setCancelled();
+							return;
+						}
+		
+					}
+				break;
+				}
+			}
+		}
+	}
 	
 //  ____  _               _____           
 // / ___|(_) __ _ _ __   |_   _|_ _ _ __  
@@ -352,8 +369,15 @@ class EventListener implements Listener
 		$event->setLine(1, ($saleNum == 0? "DONATE" : "$saleNum"));
 		$event->setLine(2, ($price == 0? "FREE" : "B ".round($price,2) . MassiveEconomyAPI::getInstance()->getMoneySymbol()));
 		$event->setLine(3, "$productName");
-
-		$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $chest);
+		
+		// Quick hack to fix this for now, it will need more work in the near future
+		$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $chest[0]);
+		
+		// Check for double chest
+		if(($pairChest = $event->getBlock()->getLevel()->getTile($chest[0])->getPair()) !== null){
+			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} created a double chest shop");
+			$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $pairChest);		
+		}
 		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
 	}
@@ -368,31 +392,26 @@ class EventListener implements Listener
 // This can also be used for the double chest mechanism :P
 // This has potentially serious issues though, because what if you place a sign between 2 chests? Which one does it pick?
 // Possibly not the one the player intends, this will need refinement.
+
+//Return an array of chests found
 	private function getSideChest(Position $pos){
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ()));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() + 1, $pos->getY(), $pos->getZ()));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() - 1, $pos->getY(), $pos->getZ()));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() + 1));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() - 1));
-		if ($block->getID() === Block::TRAPPED_CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ()));
-		if ($block->getID() === Block::CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ()));
-		if ($block->getID() === Block::CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() + 1, $pos->getY(), $pos->getZ()));
-		if ($block->getID() === Block::CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX() - 1, $pos->getY(), $pos->getZ()));
-		if ($block->getID() === Block::CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() + 1));
-		if ($block->getID() === Block::CHEST) return $block;
-		$block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() - 1));
-		if ($block->getID() === Block::CHEST) return $block;
-		return false;
+		$found = [];
+		
+		foreach(self::SUPPORTED_TYPES as $type){
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX() - 1, $pos->getY(), $pos->getZ())))->getID() === $type) $found[] = $block;
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX() + 1, $pos->getY(), $pos->getZ())))->getID() === $type) $found[] = $block;			
+			
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ())))->getID() === $type) $found[] = $block;
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ())))->getID() === $type) $found[] = $block;
+			
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() - 1)))->getID() === $type) $found[] = $block;
+			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() + 1)))->getID() === $type) $found[] = $block;
+		}
+		
+		if(count($found) === 0){
+			return false;
+		}else{
+			return $found;
+		}
 	}
 } 
