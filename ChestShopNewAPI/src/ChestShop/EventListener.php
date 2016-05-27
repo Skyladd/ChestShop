@@ -56,8 +56,7 @@ class EventListener implements Listener
 							"chestZ" => $chest->getZ()
 						];
 						$shopInfo = $this->databaseManager->selectByCondition($condition);
-						if($shopInfo !== false){
-							$event->getPlayer()->sendTip("You can't place chests by ChestShops");
+						if($shopInfo["shopOwner"] !== false){
 							$event->setCancelled();
 							return;
 						}
