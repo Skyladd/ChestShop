@@ -107,6 +107,9 @@ class EventListener implements Listener
 					if ($item->getID() === $pID and $item->getDamage() === $pMeta) $itemNum += $item->getCount();
 				}
 				if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
+				if($player->getGamemode() == 1 and !$player->hasPermission('chestshop.creative')){
+				return;
+				}
 				$player->addWindow($chest->getInventory());
 					return;
 				}
