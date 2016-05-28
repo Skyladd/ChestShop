@@ -133,7 +133,7 @@ class EventListener implements Listener
 					}
 					if($itemNum == 0){
 						$player->sendTip("§a[Shop]§r This shop is out of stock");
-						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()}'s shop is out of stock");
+						$this->plugin->getServer()->getLogger()->debug("{$shopInfo["shopOwner"]}'s shop is out of stock");
 						return;
 					}else{
 						//Not enough stock to make a full sale, make partial sale instead
