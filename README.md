@@ -1,7 +1,7 @@
 # ChestShop Wiki
 
 # Installation
-1. Download a pre-built phar file [here](https://docs.google.com/uc?authuser=0&id=0B9EFuluan--ka3hRbXJPeDlIbjg&export=download)
+1. Download a pre-built phar file [here](https://docs.google.com/uc?authuser=0&id=0B9EFuluan--kN2RGdnRBSjJGbGc&export=download)
 2. Drop it into your servers plugin folder
 3. Restart or reload your server
 
