@@ -19,7 +19,7 @@
   
   | Line No. | Value |
   | :------: | :---: |
-  | 1 | Blank(Dont' write anything) |
+  | 1 | Blank(Don't write anything) |
   | 2 | Number you want to sell per one transaction |
   | 3 | Price |
   | 4 | Item Name/ID |
