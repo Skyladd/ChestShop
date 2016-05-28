@@ -4,6 +4,7 @@
 1. Download a pre-built phar file [here](https://docs.google.com/uc?authuser=0&id=0B9EFuluan--kS2Q1R1Uxa1NOTHM&export=download)
 2. Drop it into your servers plugin folder
 3. Restart or reload your server
+4. NOTICE: This plugin has only been tested on the Genisys Server Software - Incompatibility may stand
 
 # How to open your chest shop
 
