@@ -15,8 +15,6 @@ use pocketmine\tile\Chest as TileChest;
 use pocketmine\utils\TextFormat;
 use MassiveEconomy\MassiveEconomyAPI;
 
-//Don't touch |
-//            v
 class EventListener implements Listener
 {
 	const SUPPORTED_TYPES = [Block::CHEST, Block::TRAPPED_CHEST];
@@ -29,8 +27,7 @@ class EventListener implements Listener
 		$this->plugin = $plugin;
 		$this->databaseManager = $databaseManager;
 	}
-//Don't touch ^
-//            |
+
 
 //Get player by full name, fix selection of, say, SKYLADD when the owner is SKY (name short-typing mechanisms can be a pain in the arse)
 	private function getPlayerByName($name){
@@ -67,14 +64,8 @@ class EventListener implements Listener
 			}
 		}
 	}
-	
-//  ____  _               _____           
-// / ___|(_) __ _ _ __   |_   _|_ _ _ __  
-// \___ \| |/ _` | '_ \    | |/ _` | '_ \ 
-//  ___) | | (_| | | | |   | | (_| | |_) |
-// |____/|_|\__, |_| |_|   |_|\__,_| .__/ 
-//          |___/                  |_|    
 
+//Sign tap
 
 	public function onPlayerInteract(PlayerInteractEvent $event){
 		// Ignore left-click events, fixes spam of Bought blah blah messages when destroying a shop
@@ -85,7 +76,7 @@ class EventListener implements Listener
 		
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
- 
+
 		switch ($block->getID()) {
 			case Block::SIGN_POST:
 			case Block::WALL_SIGN:
@@ -105,7 +96,7 @@ class EventListener implements Listener
 					return;
 				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
-				if (!is_numeric($buyerMoney)) { // Probably $buyerMoney is instance of SimpleError
+				if (!is_numeric($buyerMoney)) { // Checks for simple errors
 					$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
 					return;
 				}
@@ -114,7 +105,7 @@ class EventListener implements Listener
 					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} didn't have enough money to buy");
 					return;
 				}
-				/** @var TileChest $chest */
+				//@var TileChest $chest
 				$chest = $player->getLevel()->getTile(new Vector3($shopInfo['chestX'], $shopInfo['chestY'], $shopInfo['chestZ']));
 				$itemNum = 0;
 				$pID = $shopInfo['productID'];
@@ -122,7 +113,7 @@ class EventListener implements Listener
 				$productName = Item::fromString($pID.":".$pMeta)->getName();
 				for ($i = 0; $i < $chest->getSize(); $i++) {
 					$item = $chest->getInventory()->getItem($i);
-					// use getDamage() method to get metadata of item
+					//Use getDamage() method to get metadata of item
 					if ($item->getID() === $pID and $item->getDamage() === $pMeta) $itemNum += $item->getCount();
 				}
 				$price = $shopInfo['price'];
@@ -142,13 +133,13 @@ class EventListener implements Listener
 						$saleNum = $itemNum;
 					}
 				}
-				//TODO Improve this
+				//TODO add selling to shops
 				$player->getInventory()->addItem(clone Item::get((int)$shopInfo['productID'], (int)$shopInfo['productMeta'], (int)$saleNum));
 
 				$tmpNum = $saleNum;
 				for ($i = 0; $i < $chest->getSize(); $i++) {
 					$item = $chest->getInventory()->getItem($i);
-					// Use getDamage() method to get metadata of item
+					//Use getDamage() method to get metadata of item
 					if ($item->getID() === $pID and $item->getDamage() === $pMeta) {
 						if ($item->getCount() <= $tmpNum) {
 							$chest->getInventory()->setItem($i, Item::get(Item::AIR, 0, 0));
@@ -173,21 +164,9 @@ class EventListener implements Listener
 					}
 				}
 				break;
-//  ____  _               _____             _____           _ 
-// / ___|(_) __ _ _ __   |_   _|_ _ _ __   | ____|_ __   __| |
-// \___ \| |/ _` | '_ \    | |/ _` | '_ \  |  _| | '_ \ / _` |
-//  ___) | | (_| | | | |   | | (_| | |_) | | |___| | | | (_| |
-// |____/|_|\__, |_| |_|   |_|\__,_| .__/  |_____|_| |_|\__,_|
-//          |___/                  |_|                        
 
-//   ____ _               _     _____           
-//  / ___| |__   ___  ___| |_  |_   _|_ _ _ __  
-// | |   | '_ \ / _ \/ __| __|   | |/ _` | '_ \ 
-// | |___| | | |  __/\__ \ |_    | | (_| | |_) |
-//  \____|_| |_|\___||___/\__|   |_|\__,_| .__/ 
-//                                       |_|    
+//Chest tap
 
-                            
 			case Block::CHEST:
 			case Block::TRAPPED_CHEST:
 				$shopInfo = $this->databaseManager->selectByCondition([
@@ -221,25 +200,10 @@ class EventListener implements Listener
 		}
 	}
 
-//   ____ _               _     _____             _____           _ 
-//  / ___| |__   ___  ___| |_  |_   _|_ _ _ __   | ____|_ __   __| |
-// | |   | '_ \ / _ \/ __| __|   | |/ _` | '_ \  |  _| | '_ \ / _` |
-// | |___| | | |  __/\__ \ |_    | | (_| | |_) | | |___| | | | (_| |
-//  \____|_| |_|\___||___/\__|   |_|\__,_| .__/  |_____|_| |_|\__,_|
-//                                       |_|                        
-
-
-//  ____                 _      ____  _                 
-// | __ ) _ __ ___  __ _| | __ / ___|| |__   ___  _ __  
-// |  _ \| '__/ _ \/ _` | |/ / \___ \| '_ \ / _ \| '_ \ 
-// | |_) | | |  __/ (_| |   <   ___) | | | | (_) | |_) |
-// |____/|_|  \___|\__,_|_|\_\ |____/|_| |_|\___/| .__/ 
-//                                               |_|    
-
+//Shop protection
 
 	private function destroyByCondition(&$event, $condition){
-		$this->plugin->getServer()->getLogger()->debug("destroyByCondition method fired");
-		
+
 		$player = $event->getPlayer();
 		$shopInfo = $this->databaseManager->selectByCondition($condition);
 		if ($shopInfo !== false) {
@@ -255,22 +219,13 @@ class EventListener implements Listener
 			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} removed {$shopInfo['shopOwner']}'s shop");
 			return;
 		}
+				$this->plugin->getServer()->getLogger()->debug("destroyByCondition method ended");
 	}
-//  ____                 _      ____  _                   _____           _ 
-// | __ ) _ __ ___  __ _| | __ / ___|| |__   ___  _ __   | ____|_ __   __| |
-// |  _ \| '__/ _ \/ _` | |/ / \___ \| '_ \ / _ \| '_ \  |  _| | '_ \ / _` |
-// | |_) | | |  __/ (_| |   <   ___) | | | | (_) | |_) | | |___| | | | (_| |
-// |____/|_|  \___|\__,_|_|\_\ |____/|_| |_|\___/| .__/  |_____|_| |_|\__,_|
-//                                               |_|                        
-//  ____            _            _      ____ _               _        _              _   ____  _             
-// |  _ \ _ __ ___ | |_ ___  ___| |_   / ___| |__   ___  ___| |_     / \   _ __   __| | / ___|(_) __ _ _ __  
-// | |_) | '__/ _ \| __/ _ \/ __| __| | |   | '_ \ / _ \/ __| __|   / _ \ | '_ \ / _` | \___ \| |/ _` | '_ \ 
-// |  __/| | | (_) | ||  __/ (__| |_  | |___| | | |  __/\__ \ |_   / ___ \| | | | (_| |  ___) | | (_| | | | |
-// |_|   |_|  \___/ \__\___|\___|\__|  \____|_| |_|\___||___/\__| /_/   \_\_| |_|\__,_| |____/|_|\__, |_| |_|
-//                                                                                               |___/       
+  
+//Break shop protection
 
 	public function onPlayerBreakBlock(BlockBreakEvent $event){
-		$this->plugin->getServer()->getLogger()->debug("BlockBreakEvent triggered");
+
 		$block = $event->getBlock();
 		$condition = [];
 		switch ($block->getID()) {
@@ -291,29 +246,16 @@ class EventListener implements Listener
 				];
 				break;
 			default:
+					$this->plugin->getServer()->getLogger()->debug("BlockBreakEvent ended");
 				return;
 		}
 		// This statement will only be reachable if the block is a potential Shop block
 		// This method will then decide if the block is a shop block or not, and handle permissions and ownership
-		// Saves unnecessarily replicated code :P
-		$this->plugin->getServer()->getLogger()->debug("Handling chest/sign destroy event");
 		$this->destroyByCondition($event, $condition);
+		$this->plugin->getServer()->getLogger()->debug("Handling chest/sign destroy event ended");
 	}
-
-//  ____            _            _      ____ _               _        _              _   ____  _               _____           _ 
-// |  _ \ _ __ ___ | |_ ___  ___| |_   / ___| |__   ___  ___| |_     / \   _ __   __| | / ___|(_) __ _ _ __   | ____|_ __   __| |
-// | |_) | '__/ _ \| __/ _ \/ __| __| | |   | '_ \ / _ \/ __| __|   / _ \ | '_ \ / _` | \___ \| |/ _` | '_ \  |  _| | '_ \ / _` |
-// |  __/| | | (_) | ||  __/ (__| |_  | |___| | | |  __/\__ \ |_   / ___ \| | | | (_| |  ___) | | (_| | | | | | |___| | | | (_| |
-// |_|   |_|  \___/ \__\___|\___|\__|  \____|_| |_|\___||___/\__| /_/   \_\_| |_|\__,_| |____/|_|\__, |_| |_| |_____|_| |_|\__,_|
-//                                                                                               |___/         
-
                   
-//  ____  _               _____       ____  _                 
-// / ___|(_) __ _ _ __   |_   _|__   / ___|| |__   ___  _ __  
-// \___ \| |/ _` | '_ \    | |/ _ \  \___ \| '_ \ / _ \| '_ \ 
-//  ___) | | (_| | | | |   | | (_) |  ___) | | | | (_) | |_) |
-// |____/|_|\__, |_| |_|   |_|\___/  |____/|_| |_|\___/| .__/ 
-//          |___/                                      |_|    
+//Sign register to shop
 
 	public function onSignChange(SignChangeEvent $event){
 		$sign = $event->getBlock();
@@ -338,22 +280,13 @@ class EventListener implements Listener
 		if($item->getID() < 1){ //Invalid item ID/name
 			return;
 		}
-//  ____  _               _____       ____  _                   _____           _ 
-// / ___|(_) __ _ _ __   |_   _|__   / ___|| |__   ___  _ __   | ____|_ __   __| |
-// \___ \| |/ _` | '_ \    | |/ _ \  \___ \| '_ \ / _ \| '_ \  |  _| | '_ \ / _` |
-//  ___) | | (_| | | | |   | | (_) |  ___) | | | | (_) | |_) | | |___| | | | (_| |
-// |____/|_|\__, |_| |_|   |_|\___/  |____/|_| |_|\___/| .__/  |_____|_| |_|\__,_|
-//          |___/                                      |_|                        
 
-//  ____  _               _____                          _   
-// / ___|(_) __ _ _ __   |  ___|__  _ __ _ __ ___   __ _| |_ 
-// \___ \| |/ _` | '_ \  | |_ / _ \| '__| '_ ` _ \ / _` | __|
-//  ___) | | (_| | | | | |  _| (_) | |  | | | | | | (_| | |_ 
-// |____/|_|\__, |_| |_| |_|  \___/|_|  |_| |_| |_|\__,_|\__|
-//          |___/               
+
+//Sign format
+
 		$pID = $item->getID();
 		$pMeta = $item->getDamage();
-                             
+
 		if ($event->getLine(0) !== "") return;
 		if ($price == 0 and $saleNum == 0){
 		return;
@@ -380,15 +313,8 @@ class EventListener implements Listener
 		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
 	}
-//  ____  _               _____                          _     _____           _ 
-// / ___|(_) __ _ _ __   |  ___|__  _ __ _ __ ___   __ _| |_  | ____|_ __   __| |
-// \___ \| |/ _` | '_ \  | |_ / _ \| '__| '_ ` _ \ / _` | __| |  _| | '_ \ / _` |
-//  ___) | | (_| | | | | |  _| (_) | |  | | | | | | (_| | |_  | |___| | | | (_| |
-// |____/|_|\__, |_| |_| |_|  \___/|_|  |_| |_| |_|\__,_|\__| |_____|_| |_|\__,_|
-//          |___/                                                                
 
 // Where sign can be placed for usable shop
-// This can also be used for the double chest mechanism :P
 // This has potentially serious issues though, because what if you place a sign between 2 chests? Which one does it pick?
 // Possibly not the one the player intends, this will need refinement.
 
@@ -413,4 +339,4 @@ class EventListener implements Listener
 			return $found;
 		}
 	}
-} 
+}
