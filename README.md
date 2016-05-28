@@ -57,6 +57,6 @@
 
 3. This plugin is still in development, please report any issues [here](https://github.com/Skyladd/ChestShop/issues/new)
 
-4. Double chests are currently not supported, any issues regarding shops and double chests will be discarded
+4. Double chests are supported
 
 5. More features like selling items to shops coming soon!
