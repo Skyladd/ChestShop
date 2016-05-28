@@ -22,8 +22,7 @@ class EventListener implements Listener
 	private $plugin;
 	private $databaseManager;
 
-	public function __construct(ChestShop $plugin, DatabaseManager $databaseManager)
-	{
+	public function __construct(ChestShop $plugin, DatabaseManager $databaseManager){
 		$this->plugin = $plugin;
 		$this->databaseManager = $databaseManager;
 	}
@@ -39,6 +38,10 @@ class EventListener implements Listener
 		}else{
 			return false;
 		}
+	}
+	
+	private function namesMatch($nameA, $nameB){
+		return strtolower($nameA) === strtolower($nameB);		
 	}
 
 	public function onBlockPlaced(BlockPlaceEvent $event){
@@ -57,9 +60,8 @@ class EventListener implements Listener
 							$event->setCancelled();
 							return;
 						}
-		
 					}
-				break;
+					break;
 				}
 			}
 		}
@@ -69,8 +71,8 @@ class EventListener implements Listener
 
 	public function onPlayerInteract(PlayerInteractEvent $event){
 		// Ignore left-click events, fixes spam of Bought blah blah messages when destroying a shop
-		if($event->getAction() == $event::LEFT_CLICK_BLOCK){
-			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} left-clicked, ignoring");
+		if($event->getAction() !== $event::RIGHT_CLICK_BLOCK){
+			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} did not right-click, ignoring");
 			return;
 		}
 		
@@ -79,137 +81,154 @@ class EventListener implements Listener
 		switch ($block->getID()) {
 			case Block::SIGN_POST:
 			case Block::WALL_SIGN:
-				if (($shopInfo = $this->databaseManager->selectByCondition([
+				$shopInfo = $this->databaseManager->selectByCondition([
 						"signX" => $block->getX(),
 						"signY" => $block->getY(),
 						"signZ" => $block->getZ()
-					])) === false) return;
-				$event->setCancelled();
-				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
-				if (!is_numeric($buyerMoney)) { // Checks for simple errors
-					$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
-					return;
-				}
-				if ($buyerMoney < $shopInfo['price']) {
-					$player->sendTip("§a[Shop]§r Not enough money");
-					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} didn't have enough money to buy");
-					return;
-				}
-				//@var TileChest $chest
-				$chest = $player->getLevel()->getTile(new Vector3($shopInfo['chestX'], $shopInfo['chestY'], $shopInfo['chestZ']));
-				$itemNum = 0;
-				$pID = $shopInfo['productID'];
-				$pMeta = $shopInfo['productMeta'];
-				$productName = Item::fromString($pID.":".$pMeta)->getName();
-				for ($i = 0; $i < $chest->getSize(); $i++) {
-					$item = $chest->getInventory()->getItem($i);
-					//Use getDamage() method to get metadata of item
-					if ($item->getID() === $pID and $item->getDamage() === $pMeta) $itemNum += $item->getCount();
-				}
-				if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
-				if($player->getGamemode() == 1 and !$player->hasPermission('chestshop.creative')){
-				return;
-				}
-				$player->addWindow($chest->getInventory());
-					return;
-				}
-				$price = $shopInfo['price'];
-				$saleNum = $shopInfo['saleNum'];
-				if($player->getGamemode() == 1){
-					if ($saleNum < 1) {
-					$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
-					$player->sendTip("§a[Shop]§r You donated {$price} to {$shopInfo["shopOwner"]}");
-					return;
-					}
-					$player->sendTip("§a[Shop]§r You can't buy in creative");
+				]);
+				
+				//Check if the touched sign belongs to a shop
+				
+				if ($shopInfo !== false){
 					$event->setCancelled();
-					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
-					return;
-				}
-				if ($itemNum < $saleNum) {
-					// Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
-					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendTip("§a[Shop]§r Your $productName shop is out of stock");
-					}
-					if($itemNum == 0){
-						$player->sendTip("§a[Shop]§r This shop is out of stock");
-						$this->plugin->getServer()->getLogger()->debug("{$shopInfo["shopOwner"]}'s shop is out of stock");
+					$chest = $player->getLevel()->getTile(new Vector3($shopInfo['chestX'], $shopInfo['chestY'], $shopInfo['chestZ']));
+					//Player tapped a sign for their own shop
+					if ($this->namesMatch($shopInfo['shopOwner'], $player->getName())) {
+						if($player->getGamemode() === 1 and !$player->hasPermission('chestshop.creative')){
+							return;
+						}
+						$player->addWindow($chest->getInventory());
 						return;
-					}else{
-						//Not enough stock to make a full sale, make partial sale instead
-						$price = round((($price/$saleNum)*$itemNum),2);
-						$saleNum = $itemNum;
+					}			
+					
+					//Otherwise proceed with transaction
+					$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
+					if (!is_numeric($buyerMoney)) { // Checks for simple errors
+						$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
+						return;
 					}
-				}
-				//TODO add selling to shops
-				$player->getInventory()->addItem(clone Item::get((int)$shopInfo['productID'], (int)$shopInfo['productMeta'], (int)$saleNum));
-
-				$tmpNum = $saleNum;
-				for ($i = 0; $i < $chest->getSize(); $i++) {
-					$item = $chest->getInventory()->getItem($i);
-					//Use getDamage() method to get metadata of item
-					if ($item->getID() === $pID and $item->getDamage() === $pMeta) {
-						if ($item->getCount() <= $tmpNum) {
-							$chest->getInventory()->setItem($i, Item::get(Item::AIR, 0, 0));
-							$tmpNum -= $item->getCount();
-						} else {
-							$chest->getInventory()->setItem($i, Item::get($item->getID(), $pMeta, $item->getCount() - $tmpNum));
-							break;
+					if ($buyerMoney < $shopInfo['price']) {
+						$player->sendTip("§a[Shop]§r Not enough money");
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} didn't have enough money to buy");
+						return;
+					}
+					//@var TileChest $chest
+					$chest = $player->getLevel()->getTile(new Vector3($shopInfo['chestX'], $shopInfo['chestY'], $shopInfo['chestZ']));
+					$itemNum = 0;
+					$pID = $shopInfo['productID'];
+					$pMeta = $shopInfo['productMeta'];
+					$productName = Item::fromString($pID.":".$pMeta)->getName();
+					for ($i = 0; $i < $chest->getSize(); $i++) {
+						$item = $chest->getInventory()->getItem($i);
+						//Use getDamage() method to get metadata of item
+						if ($item->getID() === $pID and $item->getDamage() === $pMeta){ 
+							$itemNum += $item->getCount();
 						}
 					}
-				}
-				$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
-				if ($saleNum > 0){
-					$player->sendTip("§a[Shop]§r You bought {$saleNum} $productName from {$shopInfo["shopOwner"]} for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendTip("§a[Shop]§r {$player->getName()} bought {$saleNum} $productName from you for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
+					
+					$price = $shopInfo['price'];
+					$saleNum = $shopInfo['saleNum'];
+					if($player->getGamemode() === 1){
+						if ($saleNum < 1) {
+							$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, strtolower($shopInfo['shopOwner']));
+							$player->sendTip("§a[Shop]§r You donated {$price} to {$shopInfo["shopOwner"]}");
+							return;
+						}
+						$player->sendTip("§a[Shop]§r You can't buy in creative");
+						$event->setCancelled();
+						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
+						return;
 					}
+					if ($itemNum < $saleNum) {
+						// Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
+						if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+							$p->sendTip("§a[Shop]§r Your $productName shop is out of stock");
+						}
+						if($itemNum == 0){
+							$player->sendTip("§a[Shop]§r This shop is out of stock");
+							$this->plugin->getServer()->getLogger()->debug("{$shopInfo["shopOwner"]}'s shop is out of stock");
+							return;
+						}else{
+							//Not enough stock to make a full sale, make partial sale instead
+							$price = round((($price/$saleNum)*$itemNum),2);
+							$saleNum = $itemNum;
+						}
+					}
+					//TODO add selling to shops
+					$player->getInventory()->addItem(clone Item::get((int)$shopInfo['productID'], (int)$shopInfo['productMeta'], (int)$saleNum));
+
+					$tmpNum = $saleNum;
+					for ($i = 0; $i < $chest->getSize(); $i++) {
+						$item = $chest->getInventory()->getItem($i);
+						//Use getDamage() method to get metadata of item
+						if ($item->getID() === $pID and $item->getDamage() === $pMeta) {
+							if ($item->getCount() <= $tmpNum) {
+								$chest->getInventory()->setItem($i, Item::get(Item::AIR, 0, 0));
+								$tmpNum -= $item->getCount();
+							} else {
+								$chest->getInventory()->setItem($i, Item::get($item->getID(), $pMeta, $item->getCount() - $tmpNum));
+								break;
+							}
+						}
+					}
+					$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, strtolower($shopInfo['shopOwner']));
+					if ($saleNum > 0){
+						$player->sendTip("§a[Shop]§r You bought {$saleNum} $productName from {$shopInfo["shopOwner"]} for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+							$p->sendTip("§a[Shop]§r {$player->getName()} bought {$saleNum} $productName from you for {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+							$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} bought from {$shopInfo["shopOwner"]}");
+						}
+					}else{
+						$player->sendTip("§a[Shop]§r Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
+							$p->sendTip("§a[Shop]§r {$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
+						}
+					}
+					return;
 				}else{
-					$player->sendTip("§a[Shop]§r Donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
-						$p->sendTip("§a[Shop]§r {$player->getName()} donated {$price}" . MassiveEconomyAPI::getInstance()->getMoneySymbol());
-					}
+					break;
 				}
-				break;
 
-//Chest tap
-
+			//Chest tap
 			case Block::CHEST:
 			case Block::TRAPPED_CHEST:
+				// Player trying to open a chest
 				$shopInfo = $this->databaseManager->selectByCondition([
 					"chestX" => $block->getX(),
 					"chestY" => $block->getY(),
 					"chestZ" => $block->getZ()
 				]);
 				if($shopInfo !== false){
+					// Chest is a shop
 					if($player->hasPermission('chestshop.manager')){
+						//Allow player to open any chest in any gamemode if they have the manager permission
 						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} opened {$shopInfo['shopOwner']}'s shop ");
 						return;
 					}
-					if ($shopInfo['shopOwner'] !== strtolower($player->getName())) {
-						$event->setCancelled();
-						return;
-					}
-					if($player->hasPermission('chestshop.creative')){
-						return;
-					}
-					if($player->getGamemode() == 1){
-						$player->sendTip("§a[Shop]§r You can't stock in creative");
-						$event->setCancelled();
-						$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried stocking in creative");
-						return;
+					else{
+						// Player doesn't have manager permission
+						if(!$this->namesMatch($shopInfo['shopOwner'],$player->getName())) {
+							//Player attempted to open a shop that wasn't theirs
+							$event->setCancelled();
+							return;
+						}else{
+							if(!$player->hasPermission('chestshop.creative') and $player->getGamemode() === 1){
+								// Player attempted to restock in creative without permission
+								$player->sendTip("§a[Shop]§r You can't stock in creative");
+								$event->setCancelled();
+								$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried stocking in creative");
+								return;
+							}
+						}
 					}
 				}
 				break;
-
 			default:
 				break;
 		}
 	}
 
 //Shop protection
-
 	private function destroyByCondition(&$event, $condition){
 
 		$player = $event->getPlayer();
@@ -227,13 +246,11 @@ class EventListener implements Listener
 			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} removed {$shopInfo['shopOwner']}'s shop");
 			return;
 		}
-				$this->plugin->getServer()->getLogger()->debug("destroyByCondition method ended");
+		$this->plugin->getServer()->getLogger()->debug("destroyByCondition method ended");
 	}
   
 //Break shop protection
-
 	public function onPlayerBreakBlock(BlockBreakEvent $event){
-
 		$block = $event->getBlock();
 		$condition = [];
 		switch ($block->getID()) {
@@ -254,7 +271,7 @@ class EventListener implements Listener
 				];
 				break;
 			default:
-					$this->plugin->getServer()->getLogger()->debug("BlockBreakEvent ended");
+				$this->plugin->getServer()->getLogger()->debug("BlockBreakEvent ended");
 				return;
 		}
 		// This statement will only be reachable if the block is a potential Shop block
@@ -281,15 +298,13 @@ class EventListener implements Listener
 			return;
 		}
 		
-		$shopOwner = strtolower($event->getPlayer()->getName());
+		$shopOwner = $event->getPlayer()->getName();
 		$price = $event->getLine(2);
 		$saleNum = $event->getLine(1);
 		$item = Item::fromString($event->getLine(3));
 		if($item->getID() < 1){ //Invalid item ID/name
 			return;
 		}
-
-
 //Sign format
 
 		$pID = $item->getID();
@@ -297,7 +312,7 @@ class EventListener implements Listener
 
 		if ($event->getLine(0) !== "") return;
 		if ($price == 0 and $saleNum == 0){
-		return;
+			return;
 		}
 		if (!ctype_digit($saleNum)) return;
 		if (!is_numeric($price) or $price < 0) return;
