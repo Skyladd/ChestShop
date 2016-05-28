@@ -89,12 +89,6 @@ class EventListener implements Listener
 				if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
 					return;
 				}
-				if($player->getGamemode() == 1){
-					$player->sendTip("§a[Shop]§r You can't buy in creative");
-					$event->setCancelled();
-					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
-					return;
-				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
 				if (!is_numeric($buyerMoney)) { // Checks for simple errors
 					$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
@@ -118,6 +112,17 @@ class EventListener implements Listener
 				}
 				$price = $shopInfo['price'];
 				$saleNum = $shopInfo['saleNum'];
+				if($player->getGamemode() == 1){
+					if ($saleNum < 1) {
+					$this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->payMoneyToPlayer(strtolower($player->getName()), $price, $shopInfo['shopOwner']);
+					$player->sendTip("§a[Shop]§r You donated {$price} to {$shopInfo["shopOwner"]}");
+					return;
+					}
+					$player->sendTip("§a[Shop]§r You can't buy in creative");
+					$event->setCancelled();
+					$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} tried buying in creative mode");
+					return;
+				}
 				if ($itemNum < $saleNum) {
 					// Need to check if the returned player's name is equal to the shop owner, fix short-type bugs
 					if (($p = $this->getPlayerByName($shopInfo["shopOwner"])) !== false) {
