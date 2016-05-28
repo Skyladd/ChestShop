@@ -12,8 +12,6 @@ use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Chest as TileChest;
-use pocketmine\block\Chest;
-use pocketmine\inventory\ChestInventory;
 use pocketmine\utils\TextFormat;
 use MassiveEconomy\MassiveEconomyAPI;
 
