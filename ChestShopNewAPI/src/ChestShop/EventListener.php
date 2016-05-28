@@ -12,6 +12,8 @@ use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Chest as TileChest;
+use pocketmine\block\Chest;
+use pocketmine\inventory\ChestInventory;
 use pocketmine\utils\TextFormat;
 use MassiveEconomy\MassiveEconomyAPI;
 
@@ -76,7 +78,6 @@ class EventListener implements Listener
 		
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
-
 		switch ($block->getID()) {
 			case Block::SIGN_POST:
 			case Block::WALL_SIGN:
@@ -86,9 +87,6 @@ class EventListener implements Listener
 						"signZ" => $block->getZ()
 					])) === false) return;
 				$event->setCancelled();
-				if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
-					return;
-				}
 				$buyerMoney = $this->plugin->getServer()->getPluginManager()->getPlugin("MassiveEconomy")->getMoney(strtolower($player->getName()));
 				if (!is_numeric($buyerMoney)) { // Checks for simple errors
 					$player->sendTip("§a[Shop]§r Couldn't acquire your money data!");
@@ -109,6 +107,10 @@ class EventListener implements Listener
 					$item = $chest->getInventory()->getItem($i);
 					//Use getDamage() method to get metadata of item
 					if ($item->getID() === $pID and $item->getDamage() === $pMeta) $itemNum += $item->getCount();
+				}
+				if ($shopInfo['shopOwner'] === strtolower($player->getName())) {
+				$player->addWindow($chest->getInventory());
+					return;
 				}
 				$price = $shopInfo['price'];
 				$saleNum = $shopInfo['saleNum'];
@@ -313,7 +315,7 @@ class EventListener implements Listener
 		// Check for double chest
 		if(($pairChest = $event->getBlock()->getLevel()->getTile($chest[0])->getPair()) !== null){
 			$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} created a double chest shop");
-			$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $pairChest);		
+			$this->databaseManager->registerShop($shopOwner, $saleNum, round($price,2), $pID, $pMeta, $sign, $pairChest);
 		}
 		$this->plugin->getServer()->getLogger()->debug("{$event->getPlayer()->getName()} made a shop");
 		return;
