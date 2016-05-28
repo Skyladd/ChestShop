@@ -33,6 +33,8 @@
 
 3. If you want to sell an item for free make the cost 0
 
+4. Double chests are supported
+
 ![Locate a sign next to Chest](https://github.com/Skyladd/ChestShop/blob/master/Images/Screenshot_2016-05-02-14-06-36.png)
 
 3. The item names are not case sensitive, but for items such as birch logs you will need to include the meta data for the item example.. log:2
@@ -56,7 +58,5 @@
 2. More economy plugins may be supported in the future
 
 3. This plugin is still in development, please report any issues [here](https://github.com/Skyladd/ChestShop/issues/new)
-
-4. Double chests are supported
 
 5. More features like selling items to shops coming soon!
