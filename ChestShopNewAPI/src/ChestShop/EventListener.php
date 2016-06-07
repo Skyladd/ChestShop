@@ -342,20 +342,16 @@ class EventListener implements Listener
 // Possibly not the one the player intends, this will need refinement.
 
 //Return an array of chests found
-	private function getSideChest(Position $pos){
+	private function getSideChest($pos){
 		$found = [];
 		
 		foreach(self::SUPPORTED_TYPES as $type){
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX() - 1, $pos->getY(), $pos->getZ())))->getID() === $type) $found[] = $block;
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX() + 1, $pos->getY(), $pos->getZ())))->getID() === $type) $found[] = $block;			
-			
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() - 1, $pos->getZ())))->getID() === $type) $found[] = $block;
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY() + 1, $pos->getZ())))->getID() === $type) $found[] = $block;
-			
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() - 1)))->getID() === $type) $found[] = $block;
-			if(($block = $pos->getLevel()->getBlock(new Vector3($pos->getX(), $pos->getY(), $pos->getZ() + 1)))->getID() === $type) $found[] = $block;
+			for($i = 0; $i <= 5; $i++){
+				if(($block = $pos->getSide($i))->getID() === $type){
+					$found[] = $block;
+				}
+			}
 		}
-		
 		if(count($found) === 0){
 			return false;
 		}else{
